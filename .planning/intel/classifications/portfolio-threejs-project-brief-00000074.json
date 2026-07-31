@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Иван Шиваршинов/Documents/Моя папка/Работа/Мои проекты/Моё портфолио/docs/portfolio_threejs_project_brief.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Three.js-направление для портфолио",
+  "summary": "Проектный документ о роли Three.js в портфолио: позиционирование, дизайн-система, архитектура в Astro, производительность, процесс реализации и критерии принятия.",
+  "scope": ["Three.js", "портфолио", "Astro", "Stacki", "интерактивный индекс работ", "Work", "Lab", "About", "WebGL", "AI-агент"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": 1,
+  "notes": ""
+}

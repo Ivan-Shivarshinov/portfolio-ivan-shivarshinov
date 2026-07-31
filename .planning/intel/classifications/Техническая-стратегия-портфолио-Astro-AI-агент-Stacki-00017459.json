@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Иван Шиваршинов/Documents/Моя папка/Работа/Мои проекты/Моё портфолио/docs/Техническая стратегия портфолио Astro + AI-агент + Stacki.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Техническая стратегия портфолио: Astro + AI-агент + Stacki",
+  "summary": "Strategy choosing Astro + AI-agent + Stacki as the portfolio's hybrid development workflow, defining roles, architecture, and quality gates.",
+  "scope": ["Astro", "Stacki", "AI-агент", "Git", "Webflow", "Content Collections", "design tokens", "React islands"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

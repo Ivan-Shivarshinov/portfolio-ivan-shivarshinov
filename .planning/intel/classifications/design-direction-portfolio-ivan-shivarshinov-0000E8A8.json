@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Иван Шиваршинов/Documents/Моя папка/Работа/Мои проекты/Моё портфолио/docs/design_direction_portfolio_ivan_shivarshinov.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Дизайн-направление сайта-портфолио",
+  "summary": "Визуальная концепция, UX-принципы и система референсов для портфолио product-minded web developer.",
+  "scope": ["сайт-портфолио", "визуальная концепция", "UX и информационная архитектура", "интерактивный индекс проектов", "motion и интерактивность", "Webflow", "CMS", "типографика"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": 0,
+  "notes": ""
+}

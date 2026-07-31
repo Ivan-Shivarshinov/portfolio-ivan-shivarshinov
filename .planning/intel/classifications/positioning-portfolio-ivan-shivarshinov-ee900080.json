@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Иван Шиваршинов/Documents/Моя папка/Работа/Мои проекты/Моё портфолио/docs/positioning_portfolio_ivan_shivarshinov.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Позиционирование сайта-портфолио",
+  "summary": "Strategic positioning for the portfolio site: positions Ivan Shivarshinov as a Product-minded Web Developer bridging Webflow, code, SEO/AEO, and AI.",
+  "scope": ["portfolio website", "Product-minded Web Developer", "Webflow", "CMS", "SEO/AEO", "AI-assisted workflows", "web products"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}
