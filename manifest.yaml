@@ -1,0 +1,15 @@
+# Manifest for /gsd-ingest-docs — portfolio project context documents
+# Types: ADR | PRD | SPEC | DOC. precedence: lower = higher precedence (same-type ties only).
+docs:
+  - path: docs/positioning_portfolio_ivan_shivarshinov.md
+    type: PRD
+  - path: docs/design_direction_portfolio_ivan_shivarshinov.md
+    type: SPEC
+    precedence: 0
+  - path: docs/portfolio_threejs_project_brief.md
+    type: SPEC
+    precedence: 1
+  - path: docs/motion-concept-portfolio.md
+    type: DOC
+  - path: docs/Техническая стратегия портфолио Astro + AI-агент + Stacki.md
+    type: ADR

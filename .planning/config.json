@@ -1,0 +1,10 @@
+{
+  "model_profile": "quality",
+  "workflow": {
+    "plan_check": true,
+    "verifier": true
+  },
+  "git": {
+    "branching_strategy": "none"
+  }
+}
