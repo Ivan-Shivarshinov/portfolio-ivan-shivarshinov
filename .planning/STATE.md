@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: osnova-proekta
 status: executing
-stopped_at: Completed 01-01-PLAN.md (decisions recorded)
-last_updated: "2026-08-01T20:55:41.395Z"
+stopped_at: Completed 01-02-PLAN.md (validation scaffolding)
+last_updated: "2026-08-01T21:06:36.080Z"
 last_activity: 2026-08-01
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 0
+  completed_plans: 2
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 01 (osnova-proekta) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-08-01 — Phase 01 execution started
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 29%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 12 | 4 tasks | 3 files |
+| Phase 01 P02 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 01]: [01-01 T2] Черновой site URL: https://portfolio.example.com (вариант site-draft) для `site` в astro.config.mjs — обязателен для sitemap и canonical/og:url; заменяется на реальный домен в фазе 6. Research: 01-RESEARCH.md Open Question 4, Pitfall 4. Потребитель: план 01-03.
 - [Phase 01]: [01-01 T3] GitHub-репозиторий: portfolio-ivan-shivarshinov, видимость public (вариант repo-public). Следствие: docs/ (PRD, стратегия позиционирования) станут публичными — принято пользователем явно. gh CLI авторизован (Ivan-Shivarshinov, scopes repo+workflow). Research: 01-RESEARCH.md Open Question 5, Environment Availability. Потребитель: план 01-07 (создание remote).
 - [Phase 01]: [01-01 T4] AC R4: проверки и robots.txt ориентируются на sitemap-index.xml (вариант sitemap-index) — фактический вывод @astrojs/sitemap 3.x (sitemap-index.xml + sitemap-0.xml, сплит по entryLimit 45000; файла sitemap.xml нет). Требование R4 не изменено: sitemap генерируется и содержит все 5 маршрутов. Research: 01-RESEARCH.md Open Question 3, Pitfall 3. Потребители: планы 01-02 (check-seo.mjs), 01-05 (robots.txt).
+- [Phase 01]: [01-02 T1] verify-preview.mjs спавнит `npx --no-install astro preview` — честный fail-fast при отсутствии установленных зависимостей вместо недетерминированного интерактивного промпта npx в non-TTY. Потребитель: план 01-03 (прогон `--routes /`).
+- [Phase 01]: [01-02 T1] Windows-спавн .cmd-шимов (npx/npm) через `cmd.exe /d /s /c` + windowsVerbatimArguments: прямой `spawn('npx.cmd')` на Node 24 (win32) бросает EINVAL. Применено: verify-preview.mjs, check-collections.mjs (runBuild).
+- [Phase 01]: [01-02 T2] check-spike-doc.mjs задаёт контракт ключевых слов для docs/stacki-coverage.md (edge 1 — «одновременн», edge 2 — «0 запис»/«пустая коллекц»; строка пункта обязана содержать вердикт «проверено/ограничение»). Потребитель: план 01-06 (пишет документ под этот контракт).
+- [Phase 01]: [01-02 T2] Фикстуры check-collections.mjs схемо-совместимы со схемами 01-04 (projects: полный frontmatter; notes: без title; services: {id,title,description}) — негативные тесты падают по задуманной причине (DuplicateContentEntrySlugError / zod required / duplicate id). Потребитель: план 01-04.
 
 ### Pending Todos
 
@@ -93,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-01T20:55:41.382Z
-Stopped at: Completed 01-01-PLAN.md (decisions recorded)
+Last session: 2026-08-01T21:06:36.066Z
+Stopped at: Completed 01-02-PLAN.md (validation scaffolding)
 Resume file: None
