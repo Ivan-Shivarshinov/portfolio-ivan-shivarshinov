@@ -134,13 +134,37 @@ function auditPages(pages) {
 }
 
 /**
- * Аудит sitemap-индекса: ровно 5 элементов url.
+ * Аудит sitemap-вывода: парсит sitemap-index.xml (sitemapindex → дочерние <loc>),
+ * резолвит дочерние sitemap-файлы через readChild и считает суммарное число <url>.
+ * Фактический вывод @astrojs/sitemap 3.x (Pitfall 3): сам индекс <url> не содержит —
+ * маршруты лежат в sitemap-0.xml, на который индекс ссылается.
+ * @param {string} indexXml текст sitemap-index.xml
+ * @param {(fileName: string) => string|null} readChild читает дочерний sitemap по имени файла; null — файл отсутствует
  */
-function auditSitemap(xmlText) {
-  const count = (xmlText.match(/<url(?:\s|>)/g) ?? []).length;
-  return count === EXPECTED_SITEMAP_URLS
-    ? []
-    : [`${SITEMAP_INDEX} содержит ${count} url, ожидалось ${EXPECTED_SITEMAP_URLS}`];
+function auditSitemap(indexXml, readChild) {
+  const childLocs = [...indexXml.matchAll(/<\s*sitemap\s*>\s*<loc>([^<]+)<\/loc>\s*<\/sitemap>/g)].map((m) => m[1]);
+  if (childLocs.length === 0) {
+    return [`${SITEMAP_INDEX} не ссылается ни на один дочерний sitemap`];
+  }
+  const missing = [];
+  let total = 0;
+  for (const loc of childLocs) {
+    const fileName = loc.split('/').pop();
+    const text = readChild(fileName);
+    if (text === null) {
+      missing.push(fileName);
+      continue;
+    }
+    total += (text.match(/<url(?:\s|>)/g) ?? []).length;
+  }
+  const issues = [];
+  if (missing.length > 0) {
+    issues.push(`дочерние sitemap-файлы не найдены в dist/: ${missing.join(', ')}`);
+  }
+  if (total !== EXPECTED_SITEMAP_URLS) {
+    issues.push(`дочерние sitemap-файлы содержат ${total} url, ожидалось ${EXPECTED_SITEMAP_URLS}`);
+  }
+  return issues;
 }
 
 /**
@@ -163,14 +187,18 @@ function auditDist() {
       `${SITEMAP_INDEX} не найден в dist/ (проверка ориентируется на sitemap-index.xml — фактический вывод @astrojs/sitemap 3.x, файла sitemap.xml нет)`
     );
   } else {
-    issues.push(...auditSitemap(readText(sitemapAbs)));
+    const readChild = (fileName) => {
+      const p = join(DIST_DIR, fileName);
+      return existsSync(p) ? readText(p) : null;
+    };
+    issues.push(...auditSitemap(readText(sitemapAbs), readChild));
   }
   return issues;
 }
 
 function render(issues) {
   if (issues.length === 0) {
-    console.log('check-seo: OK — 5 уникальных пар title/description, canonical + OG везде, sitemap-index.xml с 5 url');
+    console.log('check-seo: OK — 5 уникальных пар title/description, canonical + OG везде, sitemap-index.xml → sitemap-0.xml с 5 url');
     return 0;
   }
   console.error(`check-seo: FAIL — ${issues.length} проблем:`);
@@ -200,7 +228,10 @@ function makePage(title, desc, opts = {}) {
 </html>`;
 }
 
-const GOOD_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
+// Фикстуры формата @astrojs/sitemap 3.x (Pitfall 3): sitemap-index.xml — sitemapindex,
+// ссылающийся на дочерний sitemap-0.xml (urlset) с маршрутами.
+const GOOD_SITEMAP_INDEX = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>https://portfolio.example.com/sitemap-0.xml</loc></sitemap></sitemapindex>`;
+const GOOD_SITEMAP_CHILD = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://portfolio.example.com/</loc></url>
   <url><loc>https://portfolio.example.com/work/</loc></url>
@@ -208,6 +239,7 @@ const GOOD_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://portfolio.example.com/about/</loc></url>
   <url><loc>https://portfolio.example.com/contact/</loc></url>
 </urlset>`;
+const makeSitemapFixtures = (childText) => (fileName) => (fileName === 'sitemap-0.xml' ? childText : null);
 
 function runSelfTest() {
   let failures = 0;
@@ -249,11 +281,13 @@ function runSelfTest() {
     'missing-og: отсутствие meta property="og:url" детектируется'
   );
 
-  // sitemap-фикстура с 5 url → pass; с 4 → fail
-  const sitemapOk = auditSitemap(GOOD_SITEMAP);
+  // sitemap-фикстура (индекс → дочерний urlset): 5 url → pass; 4 url → fail; пустой индекс → fail
+  const sitemapOk = auditSitemap(GOOD_SITEMAP_INDEX, makeSitemapFixtures(GOOD_SITEMAP_CHILD));
   assert(sitemapOk.length === 0, `sitemap: 5 url → pass (получено: ${JSON.stringify(sitemapOk)})`);
-  const sitemapBad = auditSitemap(GOOD_SITEMAP.replace('<url>', ''));
-  assert(hasIssue(sitemapBad, 'содержит 4 url'), 'sitemap: 4 url → fail детектируется');
+  const sitemapBad = auditSitemap(GOOD_SITEMAP_INDEX, makeSitemapFixtures(GOOD_SITEMAP_CHILD.replace('<url>', '')));
+  assert(hasIssue(sitemapBad, 'содержат 4 url'), 'sitemap: 4 url → fail детектируется');
+  const sitemapEmpty = auditSitemap('<sitemapindex></sitemapindex>', makeSitemapFixtures(GOOD_SITEMAP_CHILD));
+  assert(hasIssue(sitemapEmpty, 'не ссылается ни на один дочерний sitemap'), 'sitemap: пустой индекс → fail детектируется');
 
   // отсутствие canonical → детект
   const noCanonical = [
