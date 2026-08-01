@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Content Collections (projects, notes) и JSON-данные (services, skills, tools) валидируются схемами при сборке; включён TypeScript strict.
   4. Базовые layouts и общий SEO-компонент работают: каждая страница получает title, description, canonical, Open Graph; sitemap генерируется.
   5. Существует документ о покрытии конструкций Astro в Stacki (итог spike: открытие проекта, чтение компонентов и props, variants, scoped styles, CSS variables, JSON-коллекции, frontmatter, View Transitions) — зафиксирован в Git до визуальной сборки.
-**Plans**: 7 планов, 4 волны
+**Plans**: 7 планов, 5 волн
 
 Plans:
 - [ ] 01-01-PLAN.md — Решения фазы: astro major, site URL, repo name/visibility, sitemap-index wording (4 чекпоинта)
