@@ -1,0 +1,39 @@
+/* ЕДИНСТВЕННЫЙ файл токенов (SPEC R2) — значения зафиксированы в UI-SPEC 01 */
+:root {
+  /* color */
+  --color-bg: #FAFAF7;
+  --color-surface: #F1F0EB;
+  --color-ink: #1F1E1C;
+  --color-ink-muted: #5C5A55;
+  --color-accent: #A84B32;
+  --color-accent-ink: #FFFFFF;
+  --color-destructive: #B3261E;
+
+  /* typography */
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --text-body: 16px;
+  --text-label: 14px;
+  --text-heading: 20px;
+  --text-display: 32px;
+
+  /* spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* containers */
+  --container-max: 1200px;
+  --gutter-mobile: 24px;
+  --gutter-desktop: 48px;
+
+  /* motion */
+  --motion-fast: 150ms;
+  --motion-base: 250ms;
+  --motion-slow: 400ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}

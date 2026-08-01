@@ -1,0 +1,23 @@
+---
+// Seo.astro — единственный источник SEO-тегов head (SPEC R4)
+// canonical строится из Astro.url + site из astro.config.mjs (Pitfall 4)
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+}
+
+const { title, description, canonical, ogImage } = Astro.props;
+const url = canonical ?? new URL(Astro.url.pathname, Astro.site!);
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={url} />
+<meta property="og:locale" content="ru_RU" />
+{ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site!)} />}

@@ -1,0 +1,13 @@
+---
+// index.astro — маршрут /; статичный контент без клиентского JS (UI-SPEC Interaction NONE).
+// Primary CTA «Смотреть работы» намеренно не рендерится в фазе 1 (scaffolding-only,
+// UI-SPEC Color: акцент и primary CTA — только с фазы 2 визуальной сборки).
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Иван Шиваршинов — веб-разработчик с продуктовым подходом"
+  description="Создаю и развиваю сложные сайты, контентные системы и веб-инструменты."
+>
+  <h1>Иван Шиваршинов</h1>
+  <p>Фаза 2 — визуальная система</p>
+</BaseLayout>
