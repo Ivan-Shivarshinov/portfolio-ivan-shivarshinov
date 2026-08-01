@@ -120,7 +120,7 @@ Each task was committed atomically:
 1. **Task 1: verify-preview.mjs + check-tokens.mjs** - `79c13c6` (feat)
 2. **Task 2: check-seo.mjs + check-collections.mjs + check-spike-doc.mjs** - `bd8a1ea` (feat)
 
-**Plan metadata:** pending (final docs commit)
+**Plan metadata:** `63f3966` (docs: complete plan)
 
 ## Files Created/Modified
 
