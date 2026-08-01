@@ -125,3 +125,12 @@ None - внешние сервисы не требуют ручной настр
 ---
 *Phase: 01-osnova-proekta*
 *Completed: 2026-08-01*
+
+## Self-Check: PASSED
+
+- SUMMARY.md создан: `.planning/phases/01-osnova-proekta/01-01-SUMMARY.md` — FOUND
+- Коммит решений: `71e88ea` — FOUND (git log)
+- Коммит метаданных: `95b6d67` — FOUND (git log)
+- ROADMAP.md: фаза 01 показывает 1/7 планов, In Progress
+- STATE.md: Plan 2 of 7, решения [01-01 T1..T4] в секции Decisions, метрики и сессия записаны
+- Единственный незакоммиченный файл — `.planning/config.json` (изменён orchestrator'ом до старта исполнителя: `_auto_chain_active: false`); не входит в коммиты исполнителя
