@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: osnova-proekta
 status: executing
-stopped_at: Completed 01-02-PLAN.md (validation scaffolding)
-last_updated: "2026-08-01T21:06:36.080Z"
+stopped_at: Completed 01-03-PLAN.md (Astro scaffold tracer)
+last_updated: "2026-08-01T21:23:05.929Z"
 last_activity: 2026-08-01
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 01 (osnova-proekta) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-08-01 — Phase 01 execution started
 
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [███░░░░░░░] 29%
 |------|----------|-------|-------|
 | Phase 01 P01 | 12 | 4 tasks | 3 files |
 | Phase 01 P02 | 15 | 2 tasks | 5 files |
+| Phase 01 P03 | 12 | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,10 @@ Progress: [███░░░░░░░] 29%
 - [Phase 01]: [01-02 T1] Windows-спавн .cmd-шимов (npx/npm) через `cmd.exe /d /s /c` + windowsVerbatimArguments: прямой `spawn('npx.cmd')` на Node 24 (win32) бросает EINVAL. Применено: verify-preview.mjs, check-collections.mjs (runBuild).
 - [Phase 01]: [01-02 T2] check-spike-doc.mjs задаёт контракт ключевых слов для docs/stacki-coverage.md (edge 1 — «одновременн», edge 2 — «0 запис»/«пустая коллекц»; строка пункта обязана содержать вердикт «проверено/ограничение»). Потребитель: план 01-06 (пишет документ под этот контракт).
 - [Phase 01]: [01-02 T2] Фикстуры check-collections.mjs схемо-совместимы со схемами 01-04 (projects: полный frontmatter; notes: без title; services: {id,title,description}) — негативные тесты падают по задуманной причине (DuplicateContentEntrySlugError / zod required / duplicate id). Потребитель: план 01-04.
+- [Phase 01]: [01-03 T1] eslint-plugin-jsx-a11y не установлен: peer-диапазон ^3-^9 несовместим с eslint@^10 (требование eslint-plugin-astro@3); jsx-a11y — опциональный peer (peerDependenciesMeta.optional), RESEARCH: «в фазе 1 не включать агрессивно». Потребитель: фаза 2+ при включении a11y-правил.
+- [Phase 01]: [01-03 T2] Источник шрифтов — upstream-репозитории фаундри (floriankarsten/space-grotesk, JetBrains/JetBrainsMono): google/fonts GitHub больше не содержит WOFF2 (только вариативные TTF, подтверждено GitHub API). Все 3 файла валидны (wOF2). Потребители: фазы 2-3 (визуальная система).
+- [Phase 01]: [01-03 T2] space-grotesk-600.woff2 — вариативный SpaceGrotesk[wght].woff2: статичного SemiBold 600 нет ни в одном официальном источнике; инстанс 600 выбирается декларацией font-weight в @font-face (CSS Fonts 4).
+- [Phase 01]: [01-03 T3] check-prohibitions.mjs: точное совпадение для одиночных имён denylist + namespace-префиксы (@tailwindcss/, @unocss/, @angular/) — похожие имена (vuepress, react-test-renderer) не дают ложных срабатываний; пограничная фикстура в self-test. Потребитель: 01-07 (CI).
 
 ### Pending Todos
 
@@ -98,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-01T21:06:36.066Z
-Stopped at: Completed 01-02-PLAN.md (validation scaffolding)
+Last session: 2026-08-01T21:23:05.917Z
+Stopped at: Completed 01-03-PLAN.md (Astro scaffold tracer)
 Resume file: None
