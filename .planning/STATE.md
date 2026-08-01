@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: osnova-proekta
 status: executing
-stopped_at: Completed 01-04-PLAN.md (content layer)
-last_updated: "2026-08-01T21:37:22.915Z"
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-08-01T21:46:51.187Z"
 last_activity: 2026-08-01
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 01 (osnova-proekta) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-08-01 — Phase 01 execution started
 
-Progress: [██████░░░░] 57%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [██████░░░░] 57%
 | Phase 01 P02 | 15 | 2 tasks | 5 files |
 | Phase 01 P03 | 12 | 3 tasks | 16 files |
 | Phase 01-osnova-proekta P04 | 20 | 1 tasks | 6 files |
+| Phase 01-osnova-proekta P05 | 5 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Progress: [██████░░░░] 57%
 - [Phase 01]: [01-03 T2] space-grotesk-600.woff2 — вариативный SpaceGrotesk[wght].woff2: статичного SemiBold 600 нет ни в одном официальном источнике; инстанс 600 выбирается декларацией font-weight в @font-face (CSS Fonts 4).
 - [Phase 01]: [01-03 T3] check-prohibitions.mjs: точное совпадение для одиночных имён denylist + namespace-префиксы (@tailwindcss/, @unocss/, @angular/) — похожие имена (vuepress, react-test-renderer) не дают ложных срабатываний; пограничная фикстура в self-test. Потребитель: 01-07 (CI).
 - [Phase 01]: [01-04 T1] Дубликат slug/id обязан падать сборку (AC R3): в Astro 7.1.6 дефолтные glob()/file() только предупреждают (logger.warn + перезапись) — добавлены generateId для projects и strict-json-loader вместо file() (опровергнута RESEARCH A5). Потребители: фазы 2-3 (целостность коллекций).
+- [Phase 01]: [01-05 T1] Аудит sitemap в check-seo.mjs следует цепочке sitemap-index.xml → дочерние sitemap-файлы (sitemap-0.xml): индекс — sitemapindex без <url>, маршруты лежат в urlset-детях (Pitfall 3, формат @astrojs/sitemap 3.x). Потребители: фазы 2-3 (обновление EXPECTED_PAGES при добавлении страниц).
 
 ### Pending Todos
 
@@ -105,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-01T21:37:22.903Z
-Stopped at: Completed 01-04-PLAN.md (content layer)
+Last session: 2026-08-01T21:46:51.174Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None
