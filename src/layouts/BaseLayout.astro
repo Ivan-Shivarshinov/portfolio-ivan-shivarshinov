@@ -11,6 +11,13 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+// Текущий путь — для пометки активной ссылки навигации (aria-current="page").
+// Акцент для активного состояния nav — единственное разрешённое применение
+// accent-токена в фазе 1 (UI-SPEC 01: «Accent reserved for: active nav state
+// and the :focus-visible ring only in Phase 1»). Scoped-конструкция добавлена
+// для spike R5 (01-06): компонент со scoped style и CSS-переменной одновременно —
+// краевой случай 1 чек-листа docs/stacki-coverage.md.
+const pathname = Astro.url.pathname;
 ---
 <!doctype html>
 <html lang="ru">
@@ -22,11 +29,11 @@ const { title, description } = Astro.props;
   <body>
     <header>
       <nav>
-        <a href="/">Home</a>
-        <a href="/work">Work</a>
-        <a href="/lab">Lab</a>
-        <a href="/about">About</a>
-        <a href="/contact">Contact</a>
+        <a href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</a>
+        <a href="/work" aria-current={pathname === '/work' ? 'page' : undefined}>Work</a>
+        <a href="/lab" aria-current={pathname === '/lab' ? 'page' : undefined}>Lab</a>
+        <a href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>About</a>
+        <a href="/contact" aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a>
       </nav>
     </header>
     <main>
@@ -35,3 +42,11 @@ const { title, description } = Astro.props;
     <footer></footer>
   </body>
 </html>
+
+<style>
+  /* Scoped-стиль навигации (точка проверки Stacki, spike R5): активная ссылка
+     использует CSS-переменную var(--color-accent) из tokens.css. */
+  nav a[aria-current='page'] {
+    color: var(--color-accent);
+  }
+</style>
