@@ -4,13 +4,15 @@
 **Domain:** Astro static-site foundation (scaffold, design tokens, content collections, SEO, spike Stacki, CI)
 **Confidence:** HIGH
 
+> **CORRECTION (2026-08-01, после повторной проверки первоисточников):** первоначальная версия исследования утверждала «0 релизов Stacki на GitHub, установочный канал не подтверждён». Это неверно: канал распространения — отдельный репозиторий **`flowtricks/stacki-releases`** (README главного репозитория: «Pushing a v* tag triggers CI, which uploads them to the stacki-releases repo»). **v0.1.3 существует** (тег «Latest», опубликован 2026-07-30, 10 ассетов, подпись GPG). Установка: скачать установщик (Windows — NSIS) из stacki-releases; сборка из исходников — только fallback. Утверждение ADR «Stacki v0.1.3» подтверждено в части существования релиза; функциональные заявления (визуальная работа с JSON-коллекциями и стилями) README не описывает — остаются эмпирической проверкой spike R5. Все затронутые секции ниже исправлены.
+
 ## Summary
 
 Фаза превращает пустой репозиторий (docs/ + .planning/ только) в работающий Astro-проект. Все ключевые API подтверждены по официальной документации Astro (docs.astro.build) и npm-реестру: content layer (`src/content.config.ts` + `defineCollection` + loaders `glob`/`file`, zod через `astro/zod` — Zod 4), TypeScript strict через `astro/tsconfigs/strict` + `astro check` (@astrojs/check), scoped CSS + глобальные стили, `@astrojs/sitemap`, `@astrojs/mdx`, View Transitions через `<ClientRouter />`. Специфических «тёмных углов» для запланированного объёма нет — все конструкции SPEC R1–R6 имеют подтверждённый стандартный путь.
 
 **Два критических расхождения с locked-решениями (требуют подтверждения пользователя до установки):**
 1. **Версия Astro.** SPEC зафиксировал «latest stable (5.x)», но на 2026-07-29 npm `latest` = **7.1.6** (линия 5.x закончилась на 5.18.2). Официальные docs подтверждают «Astro v7 is here!». Интеграции жёстко привязаны к мажору: `@astrojs/mdx@^7` peer-требует `astro ^7`, для astro 5 нужен `@astrojs/mdx@^4`. Рекомендация: подтвердить **Astro 7.1.6** (соответствует смыслу «latest stable»), fallback — 5.18.2 с mdx@^4, если пользователь настаивает на букве SPEC. Планировщик обязан поставить checkpoint на подтверждение версии.
-2. **Stacki — установочный канал.** Репозиторий `flowtricks/stacki` реальный (MIT, Electron, «Visual Builder for Astro», парсинг-модель «layout wrapper + flat list of self-closing components with props», code fallback, «ничего не перезаписывается деструктивно») — но по GitHub API у репозитория **ноль релизов** (и `stacki-releases` — пустой репозиторий-заглушка). Утверждение из ADR «Stacki v0.1.3 добавляет работу с JSON-коллекциями» непроверяемо по первоисточникам; README вообще не упоминает variants/scoped styles/CSS variables/JSON/frontmatter/View Transitions. Именно поэтому spike R5 обязателен: первые шаги spike — разрешить установку Stacki (сборка из исходников по README как fallback) и эмпирически зафиксировать покрытие 8 конструкций.
+2. **Stacki — установочный канал (исправлено).** Репозиторий `flowtricks/stacki` реальный (MIT, Electron, «Visual Builder for Astro», парсинг-модель «layout wrapper + flat list of self-closing components with props», code fallback, «ничего не перезаписывается деструктивно»). У главного репозитория релизов нет — но это нормально: README подтверждает, что push тега `v*` через CI загружает артефакты в отдельный дистрибутивный репозиторий **`flowtricks/stacki-releases`**, откуда идёт автообновление через electron-updater. В нём существует **v0.1.3** («Latest», 2026-07-30, 10 ассетов, GPG-подпись) — утверждение ADR «Stacki v0.1.3» подтверждено. README не упоминает variants/scoped styles/CSS variables/JSON/frontmatter/View Transitions — эти 6 из 8 конструкций остаются эмпирической проверкой. Spike R5 обязателен: первые шаги — установить v0.1.3 из stacki-releases (Windows: NSIS), fallback — сборка из исходников по README.
 
 **Stacki-принцип (D-04) подтверждён первоисточником:** README `flowtricks/stacki` дословно описывает парсинг-модель «optional layout wrapper + a flat list of self-closing component instances with props» и code fallback для произвольного HTML/выражений/вложенных children. Это валидирует целевую композицию страниц: `BaseLayout` + плоские компоненты с типизированными props.
 
@@ -61,7 +63,7 @@
 | R2 | Design tokens: ровно один файл tokens.css, 5 групп CSS-переменных, без хардкода | Подтверждено: scoped styles не «видят» хардкод-проверку; глобальные переменные в :root через import в layout. UI-SPEC зафиксировал имена токенов (--color-*, --space-*, --text-*, --container-*, --motion-*) |
 | R3 | Content Collections (projects, notes) + JSON (services, skills, tools) валидируются zod при сборке; TS strict; `astro check` exit 0; падение при дубликате slug/id; проход при пустых коллекциях | Официально: content layer (src/content.config.ts, glob/file loaders, z из astro/zod — Zod 4). Дубликат slug → официальная ошибка DuplicateContentEntrySlugError; file() loader требует уникальный id на запись. @astrojs/check 0.9.10: peer typescript ^5 \|\| ^6 (не 7!) |
 | R4 | Layouts и SEO: уникальные title/description, canonical + OG на всех страницах; sitemap при сборке | @astrojs/sitemap 3.7.3 (без peer-ограничений на astro): требует `site` в конфиге; выход — sitemap-index.xml + sitemap-0.xml (не sitemap.xml — нюанс AC). SEO-теги — стандартный head-паттерн, UI-SPEC зафиксировал контракт Seo.astro |
-| R5 | Spike-документ покрытия Stacki: 8 конструкций + 2 краевых случая, закоммичен до визуальной сборки | Stacki VERIFIED: README (парсинг-модель, code fallback, MIT, Node 18+, git, gh). README не упоминает 6 из 8 конструкций — они и есть эмпирическая проверка. Риск: 0 релизов на GitHub — установка разрешается в фазе (сборка из исходников как fallback) |
+| R5 | Spike-документ покрытия Stacki: 8 конструкций + 2 краевых случая, закоммичен до визуальной сборки | Stacki VERIFIED: README (парсинг-модель, code fallback, MIT, Node 18+, git, gh) + дистрибутивный репозиторий stacki-releases (v0.1.3, 2026-07-30, 10 ассетов, GPG). README не упоминает 6 из 8 конструкций — они и есть эмпирическая проверка. Риск: совместимость установщика v0.1.3 с машиной пользователя; fallback — сборка из исходников |
 | R6 | GitHub-remote + CI (lint → build, зелёный на первом push); engines: node >= 22, astro ^5 (СМ. РАСХОЖДЕНИЕ ПО ВЕРСИИ) | gh CLI 2.95.0 установлен и авторизован (аккаунт Ivan-Shivarshinov, scope repo+workflow). eslint-plugin-astro 3.0.1: нужен ESLint >= 10, Node ^22.22.3 \|\| ^24.16.0. npm ci требует закоммиченный package-lock.json |
 </phase_requirements>
 
@@ -519,7 +521,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | «Stacki v0.1.3 добавляет визуальную работу с JSON-коллекциями и стилями» (из ADR-документа) | Summary, Stacki | [ASSUMED] — непроверяемо: 0 релизов на GitHub, README не упоминает. Если JSON/стили не видны в Stacki — spike фиксирует «ограничение», workflow не меняется (код-режим). Не влияет на решения фазы 1 |
+| A1 | «Stacki v0.1.3 добавляет визуальную работу с JSON-коллекциями и стилями» (из ADR-документа) | Summary, Stacki | [RESOLVED в части релиза: v0.1.3 существует (stacki-releases, 2026-07-30, 10 ассетов); [ASSUMED] в части функций — README не упоминает JSON/стили. Если JSON/стили не видны в Stacki — spike фиксирует «ограничение», workflow не меняется (код-режим). Не влияет на решения фазы 1 |
 | A2 | zod-синтаксис `astro/zod` идентичен на astro 5 (zod 3.23) и 7 (zod 4) для используемых конструкций (z.object/string/array/enum/coerce/optional/default) | Standard Stack | [ASSUMED] — документация проверена только для текущей (7) версии. Если пользователь подтвердит 5.x, схемы фазы 1 проверяются `astro check` — миграция тривиальна |
 | A3 | Канонический набор OG-тегов (og:title/description/type/url/image/locale) и canonical — стандарт | Code Examples | [CITED: ogp.me, w3.org canonical] — UI-SPEC зафиксировал контракт Seo.astro; риск минимален |
 | A4 | `astro check` выполняет sync типов коллекций перед проверкой | Pitfall 6 | [ASSUMED] — в свежем CI-окружении check на несуществующем `.astro/types.d.ts` поведёт себя корректно. Проверяется первым же зелёным CI |
@@ -532,9 +534,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 1. **Версия Astro: 7.1.6 (current stable) или ^5.18.2 (буква SPEC)?**
    - What we know: SPEC (2026-07-31) зафиксировал «latest stable 5.x», но npm `latest` = 7.1.6 (опубликован 2026-07-29), docs подтверждают «Astro v7 is here!»; 5.x закончился на 5.18.2. Интеграции peer-привязаны к мажору (mdx@7↔astro7, mdx@4↔astro5). Оба пути валидны для всех API фазы (content layer, strict, sitemap, mdx, ClientRouter).
    - Recommendation: **подтвердить astro@^7.1.6** (соответствует намерению «latest stable» в SPEC); fallback — буквальное ^5 + mdx@^4. Планировщик: checkpoint перед npm install; AC R6 «astro ^5» скорректировать по решению.
-2. **Установка Stacki (0 релизов на GitHub).**
-   - What we know: репозиторий реальный, MIT, README описывает `npm run dev`/`npm start` и сборку `npm run dist:win`; GitHub API: 0 releases; `stacki-releases` — заглушка без релизов.
-   - Recommendation: шаг 1 spike — пользователь пытается установить (README-канал: releases/installers или сборка из исходников `npm install && npm run dist:win`); если установка невозможна — зафиксировать в `docs/stacki-coverage.md` как ограничение окружения и перейти к кодовой проверке конструкций; решение о продолжении фазы с живым прогоном — за пользователем.
+2. **Установка Stacki (исправлено: канал подтверждён).**
+   - What we know: репозиторий реальный, MIT; дистрибуция — `flowtricks/stacki-releases` (README: «Pushing a v* tag triggers CI, which uploads them to the stacki-releases repo»; автообновление через electron-updater); **v0.1.3 существует** («Latest», 2026-07-30, 10 ассетов, GPG). README описывает `npm run dev`/`npm start` и сборку `npm run dist:win`/`dist:mac:unsigned`.
+   - Recommendation: шаг 1 spike — скачать установщик v0.1.3 из stacki-releases (Windows: NSIS) и установить; если установка невозможна — сборка из исходников `npm install && npm run dist:win`; если и это не работает — зафиксировать в `docs/stacki-coverage.md` как ограничение окружения и перейти к кодовой проверке конструкций; решение о продолжении фазы с живым прогоном — за пользователем.
 3. **Формулировка AC R4 «sitemap.xml» vs фактический вывод `sitemap-index.xml`.**
    - Recommendation: проверки и robots.txt ссылаются на `/sitemap-index.xml`; поправить AC в плане (отметить как техническое уточнение, не изменение решения).
 4. **Доменное имя для `site` в astro.config.**
@@ -554,14 +556,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 | git | Весь workflow, remote | ✓ | 2.45.2.windows.1 | — |
 | gh CLI | GitHub remote, publish | ✓ | 2.95.0 (авторизован: Ivan-Shivarshinov, repo+workflow) | — |
 | curl | Проверка preview (HTTP 200) | ✓ | 8.8.0 | — |
-| Stacki (desktop) | Spike R5 | ✗ | — | Сборка из исходников (README: npm install && npm run dist:win); иначе spike-ограничение в coverage-документе |
+| Stacki (desktop) | Spike R5 | ✗ | v0.1.3 доступен | Установщик из stacki-releases (NSIS, Windows); fallback — сборка из исходников (npm install && npm run dist:win); иначе spike-ограничение в coverage-документе |
 | GitHub Actions | CI R6 | ✓ (сервис; remote создаётся в фазе) | — | Локальный прогон lint/check/build как fallback-проверка |
 
 **Missing dependencies with no fallback:**
-- Stacki desktop-приложение — не установлено; установочный канал не подтверждён (0 releases). Блокирует только «живой» прогон spike — НЕ блокирует остальную часть фазы (спайк-документ фиксирует фактическое состояние).
+- Stacki desktop-приложение — не установлено локально; установочный канал подтверждён (v0.1.3 в stacki-releases, 2026-07-30, 10 ассетов). Блокирует только «живой» прогон spike — НЕ блокирует остальную часть фазы (спайк-документ фиксирует фактическое состояние).
 
 **Missing dependencies with fallback:**
-- Stacki: сборка из исходников по README (`npm run dist:win` на Windows) либо документирование ограничения.
+- Stacki: установщик v0.1.3 из stacki-releases (Windows: NSIS); fallback — сборка из исходников по README (`npm run dist:win`); крайний случай — документирование ограничения.
 
 ## Validation Architecture
 
@@ -642,7 +644,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 - [docs.astro.build/en/reference/errors/duplicate-content-entry-slug-error/] — официальная ошибка дубликата slug
 - [npm registry (npm view)] — версии, engines, peerDependencies всех пакетов (2026-08-01)
 - [github.com/flowtricks/stacki README (raw)] — парсинг-модель, code fallback, MIT, требования Node 18+/npm/git/gh
-- [GitHub API flowtricks/stacki/releases] — 0 релизов (установочный риск)
+- [GitHub flowtricks/stacki-releases/releases/tag/v0.1.3] — v0.1.3 «Latest» (2026-07-30, 10 ассетов, GPG-подпись; notes: «Add initial README with project title»)
+- [GitHub API flowtricks/stacki/releases] — 0 релизов в основном репо (артефакты публикуются в stacki-releases по README)
 
 ### Secondary (MEDIUM confidence)
 - [github.com/ota-meshi/eslint-plugin-astro (README)] — flat config, версии ESLint/Node
@@ -657,8 +660,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 **Confidence breakdown:**
 - Standard stack: HIGH — все версии/engines/peer-зависимости проверены по npm registry + официальным docs 2026-08-01
 - Architecture: HIGH — content layer, layout-композиция, sitemap — официальные паттерны; структура — из locked D-01/D-02 и UI-SPEC
-- Pitfalls: MEDIUM-HIGH — версионные ловушки (7/5, TS 7, sitemap-index) проверены по реестру; поведение Stacki (A1) — непроверяемо (это и есть цель spike)
-- Stacki claims: LOW-MEDIUM — README проверен дословно (HIGH для того, что README утверждает); установка/возможности вне README — LOW, эмпирика spike
+- Pitfalls: MEDIUM-HIGH — версионные ловушки (7/5, TS 7, sitemap-index) проверены по реестру; функциональное поведение Stacki вне README (A1) — непроверяемо (это и есть цель spike)
+- Stacki claims: MEDIUM-HIGH — README проверен дословно (HIGH для того, что README утверждает); релиз v0.1.3 и канал дистрибуции подтверждены по stacki-releases (HIGH); возможности вне README — LOW, эмпирика spike
 
 **Research date:** 2026-08-01
 **Valid until:** 2026-08-31 (30 дней; стек Astro обновляется быстро — перед установкой перепроверить `npm view astro dist-tags.latest` и мажорные peer-диапазоны интеграций)
