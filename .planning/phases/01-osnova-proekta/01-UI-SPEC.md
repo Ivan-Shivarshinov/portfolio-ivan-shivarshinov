@@ -1,10 +1,11 @@
 ---
 phase: 1
 slug: osnova-proekta
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-01
+reviewed_at: 2026-08-01
 ---
 
 # Phase 1 — UI Design Contract
@@ -98,6 +99,31 @@ Token names: `--color-bg`, `--color-surface`, `--color-ink`, `--color-ink-muted`
 
 ---
 
+## Containers
+
+| Token | Baseline value | Usage |
+|-------|----------------|-------|
+| `--container-max` | 1200px | Max content width for page layouts |
+| `--gutter-mobile` | 24px | Container side padding, mobile |
+| `--gutter-desktop` | 48px | Container side padding, desktop |
+
+Baseline values (user-confirmed defaults 2026-08-01) — Phase 2 refines the visual treatment without renaming tokens.
+
+---
+
+## Motion
+
+| Token | Baseline value | Usage |
+|-------|----------------|-------|
+| `--motion-fast` | 150ms | Hover/active transitions |
+| `--motion-base` | 250ms | Default transitions |
+| `--motion-slow` | 400ms | Larger/layout transitions |
+| `--ease-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | Standard easing for all transitions |
+
+Motion order for later phases: CSS transitions → vanilla JS → View Transitions → island (STATE Decisions). Phase 1 itself has zero motion — tokens are baseline only. Baseline values (user-confirmed defaults 2026-08-01) — Phase 2 refines.
+
+---
+
 ## Copywriting Contract
 
 All copy in Russian (CONTEXT D-08; EN is schema-headroom only, no UI).
@@ -145,11 +171,11 @@ Safety Gate: `not applicable — no registry blocks; ADR mandates plain CSS + va
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (2026-08-01)
