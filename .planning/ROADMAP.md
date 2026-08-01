@@ -31,7 +31,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Content Collections (projects, notes) и JSON-данные (services, skills, tools) валидируются схемами при сборке; включён TypeScript strict.
   4. Базовые layouts и общий SEO-компонент работают: каждая страница получает title, description, canonical, Open Graph; sitemap генерируется.
   5. Существует документ о покрытии конструкций Astro в Stacki (итог spike: открытие проекта, чтение компонентов и props, variants, scoped styles, CSS variables, JSON-коллекции, frontmatter, View Transitions) — зафиксирован в Git до визуальной сборки.
-**Plans**: TBD
+**Plans**: 7 планов, 4 волны
+
+Plans:
+- [ ] 01-01-PLAN.md — Решения фазы: astro major, site URL, repo name/visibility, sitemap-index wording (4 чекпоинта)
+- [ ] 01-02-PLAN.md — Валидационный каркас Wave 0: 5 скриптов (verify-preview, check-tokens, check-collections, check-seo, check-spike-doc)
+- [ ] 01-03-PLAN.md — Tracer: каркас Astro + первая страница end-to-end (config, tokens, BaseLayout, Seo, шрифты) + lint-конфиги + check-prohibitions
+- [ ] 01-04-PLAN.md — Контентный слой: content.config.ts (5 коллекций), JSON-данные, пустые коллекции, негативные фикстуры
+- [ ] 01-05-PLAN.md — Страницы-заглушки Work/Lab/About/Contact + robots.txt + SEO/preview-проверки
+- [ ] 01-06-PLAN.md — Spike Stacki: временная страница View Transitions, живой прогон, docs/stacki-coverage.md
+- [ ] 01-07-PLAN.md — CI (lint → check → build) + GitHub-remote + первый зелёный push
 
 ### Phase 2: Визуальная система
 **Goal**: Единая визуальная система «Calm Interface, Active Work»: нейтральная основа, сильная типографика, строгая модульная сетка, переиспользуемые UI-компоненты с семантическими props и motion-токены; адаптивность живёт внутри компонентов.
