@@ -55,7 +55,7 @@ Downstream agents MUST read `01-SPEC.md` before planning or implementing. Requir
 ### Инструменты и CI
 - **D-10:** Линтер/форматтер: ESLint + eslint-plugin-astro + prettier — зрелая экосистема, стандарт для Astro.
 - **D-11:** Один CI-workflow (GitHub Actions): checkout → setup-node (Node 22) → npm ci (с кэшем) → lint → `astro check` → build. Линт выполняется до build (требование SPEC R6). — **Reversibility:** reversible — workflow легко расширить в фазе 6.
-- **D-12:** Деплой-адаптер в фазе 1 не закладывается; деплой — фаза 6.
+- **D-12 [informational]:** Деплой-адаптер в фазе 1 не закладывается; деплой — фаза 6.
 
 ### Spike Stacki
 - **D-13:** Гибридный прогон: агент готовит чек-лист конструкций для проверки (по README `flowtricks/stacki`), пользователь запускает Stacki (desktop-приложение) на скаффолде и проходит сценарий, агент фиксирует результаты в документ покрытия.
