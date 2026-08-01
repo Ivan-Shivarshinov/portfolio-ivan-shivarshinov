@@ -1,0 +1,17 @@
+[
+  {
+    "id": "typescript",
+    "title": "TypeScript",
+    "description": "Типизированный JavaScript на всех уровнях проекта — от схем данных до компонентов."
+  },
+  {
+    "id": "astro",
+    "title": "Astro",
+    "description": "Контентные сайты и острова интерактивности с минимальным клиентским JS."
+  },
+  {
+    "id": "nodejs",
+    "title": "Node.js",
+    "description": "API, скрипты автоматизации и интеграции на серверном JavaScript."
+  }
+]
