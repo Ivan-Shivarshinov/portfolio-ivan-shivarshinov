@@ -178,6 +178,12 @@ None - no external service configuration required.
 - Полные прогоны скриптов против реального проекта: 01-04 (check-collections), 01-05 (check-seo + verify-preview полный), 01-06 (check-spike-doc) — согласно 01-VALIDATION.md Sampling Rate
 - Контракты скриптов зафиксированы: конфигурации 01-03/01-04/01-05/01-06 сверяются с этим SUMMARY (artifacts-секции)
 
+## Self-Check: PASSED
+
+- Files exist: scripts/verify-preview.mjs, scripts/check-tokens.mjs, scripts/check-seo.mjs, scripts/check-collections.mjs, scripts/check-spike-doc.mjs, 01-02-SUMMARY.md — FOUND
+- Commits exist: `79c13c6` (Task 1), `bd8a1ea` (Task 2) — FOUND
+- Working tree: без временных фикстур (self-tests используют os.tmpdir(), git status чист от zz-check-*)
+
 ---
 *Phase: 01-osnova-proekta*
 *Completed: 2026-08-01*
