@@ -1,0 +1,310 @@
+#!/usr/bin/env node
+// scripts/check-collections.mjs — проверка R3 (01-VALIDATION.md, Per-Task Verification Map R3):
+// негативные фикстуры: дубликат slug, отсутствие обязательного поля, дубликат id —
+// каждая обязана уронить сборку; фикстуры временные и удаляются.
+//
+// CLI:
+//   node scripts/check-collections.mjs            — полный прогон 3 негативных тестов против проекта
+//   node scripts/check-collections.mjs --self-test — логика создания/удаления фикстур на временной
+//                                                   директории БЕЗ запуска build
+//
+// Контракт 01-02-PLAN.md Task 2 (учтены схемы из 01-04-PLAN.md):
+// (a) дубликат slug: два временных .mdx в src/content/projects/ с одинаковым frontmatter-полем slug;
+//     имена БЕЗ ведущей точки (glob-лоадеры Astro игнорируют dot-файлы — иначе тест ложно зелёный);
+//     frontmatter схемо-совместимый → ожидаемая ошибка DuplicateContentEntrySlugError;
+// (b) отсутствие обязательного поля: временный .mdx в src/content/notes/ без поля title → сборка падает;
+// (c) дубликат id в JSON: резервная копия src/data/services.json, добавление записи с дублирующимся id,
+//     сборка падает, файл восстанавливается в finally.
+// После всех тестов: рабочее дерево чисто от фикстур (нет zz-check-* файлов, services.json восстановлен).
+//
+// Exit 0 — все негативные тесты упали ожидаемо и фикстуры удалены; exit 1 — иначе.
+
+import { spawnSync } from 'node:child_process';
+import {
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  copyFileSync,
+  existsSync,
+  rmSync,
+  mkdirSync,
+  mkdtempSync,
+} from 'node:fs';
+import { join, resolve, dirname, basename } from 'node:path';
+import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const PROJECTS_DIR = join(ROOT, 'src/content/projects');
+const NOTES_DIR = join(ROOT, 'src/content/notes');
+const SERVICES_FILE = join(ROOT, 'src/data/services.json');
+const FIXTURE_PREFIX = 'zz-check-';
+const BUILD_TIMEOUT_MS = 300_000;
+
+// Схемо-совместимый frontmatter projects (01-04-PLAN.md: slug, title, summary, role, stack,
+// year, status enum, client-type, order default 0, titleEn optional) — падение сборки должно быть
+// именно из-за дубликата slug, а не из-за отсутствующего поля.
+function projectFixture(slug) {
+  return `---
+slug: ${slug}
+title: ZZ Check Fixture
+summary: временная фикстура негативного теста
+role: fixture
+stack: ["fixture"]
+year: 2026
+status: "active"
+client-type: "fixture"
+order: 999
+---
+Временная фикстура ${slug} — удаляется в finally.
+`;
+}
+
+// notes: схемо-совместимо, но БЕЗ обязательного поля title (date — coerce.date, summary — optional)
+const NOTE_FIXTURE_NO_TITLE = `---
+date: 2026-01-01
+summary: временная фикстура без обязательного поля title
+---
+`;
+
+const DUP_SLUG = 'zz-check-dup';
+
+// --- Низкоуровневые помощники (общие для реального прогона и self-test) ---
+
+const writeFixture = (absPath, content) => {
+  mkdirSync(dirname(absPath), { recursive: true });
+  writeFileSync(absPath, content, 'utf8');
+};
+
+const rmSafe = (p) => {
+  try {
+    if (existsSync(p)) rmSync(p, { force: true });
+  } catch {
+    /* игнорируем — финальная проверка чистоты дерева покажет проблемы */
+  }
+};
+
+/**
+ * Резервная копия файла рядом с ним (+ '.zz-backup'), возвращает путь копии и исходное содержимое.
+ */
+function backupFile(src) {
+  const backup = src + '.zz-backup';
+  copyFileSync(src, backup);
+  return { backup, content: readFileSync(src, 'utf8') };
+}
+
+function restoreFile(src, { backup, content }) {
+  writeFileSync(src, content, 'utf8');
+  rmSafe(backup);
+}
+
+/**
+ * Запуск npm run build в заданной директории. Возвращает { status, stdout, stderr }.
+ * Windows: .cmd-шимы спавнятся через cmd.exe (EINVAL при прямом spawn).
+ */
+function runBuild(cwd = ROOT) {
+  const isWin = process.platform === 'win32';
+  const res = spawnSync(isWin ? 'cmd.exe' : 'npm', isWin ? ['/d', '/s', '/c', 'npm.cmd run build'] : ['run', 'build'], {
+    cwd,
+    encoding: 'utf8',
+    timeout: BUILD_TIMEOUT_MS,
+    windowsVerbatimArguments: isWin,
+  });
+  if (res.error) {
+    return { status: null, stdout: res.stdout ?? '', stderr: `${res.error.message}` };
+  }
+  return { status: res.status, stdout: res.stdout ?? '', stderr: res.stderr ?? '' };
+}
+
+// --- Негативные тесты ---
+
+let passed = 0;
+let failed = 0;
+
+function report(name, ok, detail) {
+  if (ok) passed++;
+  else failed++;
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? ` — ${detail}` : ''}`);
+}
+
+function duplicateSlugTest() {
+  const a = join(PROJECTS_DIR, `${FIXTURE_PREFIX}dup-a.mdx`);
+  const b = join(PROJECTS_DIR, `${FIXTURE_PREFIX}dup-b.mdx`);
+  try {
+    writeFixture(a, projectFixture(DUP_SLUG));
+    writeFixture(b, projectFixture(DUP_SLUG));
+    const { status, stderr } = runBuild();
+    if (status === 0) {
+      report('дубликат slug (projects)', false, 'сборка НЕ упала (ожидался exit != 0, DuplicateContentEntrySlugError)');
+      return;
+    }
+    const isDupError = /DuplicateContentEntrySlugError|same slug/i.test(stderr);
+    report(
+      'дубликат slug (projects)',
+      true,
+      `сборка упала ожидаемо (exit ${status})${isDupError ? ', DuplicateContentEntrySlugError подтверждён' : ''}`
+    );
+  } finally {
+    rmSafe(a);
+    rmSafe(b);
+  }
+}
+
+function missingFieldTest() {
+  const f = join(NOTES_DIR, `${FIXTURE_PREFIX}no-title.md`);
+  try {
+    writeFixture(f, NOTE_FIXTURE_NO_TITLE);
+    const { status } = runBuild();
+    report(
+      'отсутствие обязательного поля (notes, title)',
+      status !== 0,
+      status === 0 ? 'сборка НЕ упала (ожидался exit != 0 по zod-схеме)' : `сборка упала ожидаемо (exit ${status})`
+    );
+  } finally {
+    rmSafe(f);
+  }
+}
+
+function duplicateIdTest() {
+  const backup = backupFile(SERVICES_FILE);
+  try {
+    const data = JSON.parse(backup.content);
+    if (!Array.isArray(data) || data.length === 0) {
+      report('дубликат id (services.json)', false, 'services.json пуст/не массив — нечего дублировать');
+      return;
+    }
+    const dupId = data[0].id;
+    data.push({ id: dupId, title: 'ZZ Check Fixture', description: 'временная фикстура' });
+    writeFileSync(SERVICES_FILE, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+    const { status } = runBuild();
+    report(
+      'дубликат id (services.json)',
+      status !== 0,
+      status === 0 ? 'сборка НЕ упала (ожидался exit != 0 по file()-loader)' : `сборка упала ожидаемо (exit ${status})`
+    );
+  } finally {
+    restoreFile(SERVICES_FILE, backup);
+  }
+}
+
+/**
+ * Проверка чистоты рабочего дерева после всех тестов: нет zz-check-* файлов в src/content,
+ * services.json восстановлен до исходного содержимого.
+ */
+function assertTreeClean(servicesContent) {
+  const problems = [];
+  for (const dir of [PROJECTS_DIR, NOTES_DIR]) {
+    if (!existsSync(dir)) continue;
+    const leftovers = collectFiles(dir).filter((p) => basename(p).startsWith(FIXTURE_PREFIX));
+    for (const l of leftovers) problems.push(`осталась фикстура: ${l}`);
+  }
+  if (existsSync(SERVICES_FILE) && readFileSync(SERVICES_FILE, 'utf8') !== servicesContent) {
+    problems.push('services.json не восстановлен после теста дубликата id');
+  }
+  return problems;
+}
+
+function collectFiles(dir, acc = []) {
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const e of entries) {
+    if (e.name.startsWith('.')) continue;
+    const p = join(dir, e.name);
+    if (e.isDirectory()) collectFiles(p, acc);
+    else acc.push(p);
+  }
+  return acc;
+}
+
+// --- Self-test: фикстуры на временной директории БЕЗ запуска build ---
+
+function runSelfTest() {
+  let failures = 0;
+  const assert = (cond, msg) => {
+    if (!cond) {
+      console.error(`  FAIL: ${msg}`);
+      failures++;
+    }
+  };
+  const tmp = mkdtempSync(join(tmpdir(), 'check-collections-'));
+  try {
+    const proj = join(tmp, 'src/content/projects');
+    const a = join(proj, `${FIXTURE_PREFIX}dup-a.mdx`);
+    const b = join(proj, `${FIXTURE_PREFIX}dup-b.mdx`);
+    const svc = join(tmp, 'src/data/services.json');
+
+    // создание фикстур
+    writeFixture(a, 'a');
+    writeFixture(b, 'b');
+    assert(existsSync(a) && existsSync(b), 'создание фикстур-дубликатов работает');
+    // удаление фикстур
+    rmSafe(a);
+    rmSafe(b);
+    assert(!existsSync(a) && !existsSync(b), 'удаление фикстур в finally работает');
+
+    // резервная копия + восстановление services.json
+    writeFixture(svc, '{"records":[{"id":"a"}]}');
+    const backup = backupFile(svc);
+    writeFixture(svc, '{"records":[{"id":"a"},{"id":"a"}]}');
+    restoreFile(svc, backup);
+    assert(
+      readFileSync(svc, 'utf8') === '{"records":[{"id":"a"}]}' && !existsSync(svc + '.zz-backup'),
+      'backup/restore services.json возвращает исходное содержимое и убирает копию'
+    );
+
+    // rmSafe на несуществующем файле не бросает
+    rmSafe(join(tmp, 'нет-такого-файла.mdx'));
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+
+  if (failures > 0) {
+    console.error(`self-test: ${failures} сбоев логики`);
+    return false;
+  }
+  console.log('self-test: OK — создание/удаление фикстур и backup/restore работают');
+  return true;
+}
+
+// --- Точка входа ---
+
+if (process.argv.includes('--self-test')) {
+  process.exitCode = runSelfTest() ? 0 : 1;
+} else {
+  // Предусловия: структуры проекта должны существовать (создаются планом 01-04).
+  const missing = [];
+  if (!existsSync(PROJECTS_DIR)) missing.push(`src/content/projects (${PROJECTS_DIR})`);
+  if (!existsSync(NOTES_DIR)) missing.push(`src/content/notes (${NOTES_DIR})`);
+  if (!existsSync(SERVICES_FILE)) missing.push(`src/data/services.json (${SERVICES_FILE})`);
+  if (missing.length > 0) {
+    console.error(`check-collections: PREREQ_MISSING — контентный слой ещё не создан: ${missing.join(', ')}`);
+    console.error('  Полный прогон выполняется после плана 01-04 (content.config.ts + JSON-данные).');
+    process.exitCode = 1;
+    process.exit();
+  }
+
+  const servicesContent = readFileSync(SERVICES_FILE, 'utf8');
+  console.log('check-collections: прогон негативных тестов (3 сборки, ~60-90 c)...');
+  duplicateSlugTest();
+  missingFieldTest();
+  duplicateIdTest();
+
+  const leftover = assertTreeClean(servicesContent);
+  for (const p of leftover) {
+    failed++;
+    console.error(`FAIL  чистота дерева — ${p}`);
+  }
+  if (leftover.length === 0) console.log('OK    рабочее дерево чисто от фикстур');
+
+  if (failed > 0) {
+    console.error(`check-collections: FAIL — ${failed} из ${passed + failed} проверок провалены`);
+    process.exitCode = 1;
+  } else {
+    console.log(`check-collections: OK — все ${passed} негативные проверки упали ожидаемо, фикстуры удалены`);
+    process.exitCode = 0;
+  }
+}
