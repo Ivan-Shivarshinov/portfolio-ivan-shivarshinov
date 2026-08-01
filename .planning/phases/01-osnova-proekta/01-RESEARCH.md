@@ -529,7 +529,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 | A6 | Черновой `site` URL до деплоя не ломает ничего, кроме абсолютных canonical (временный URL) | Pitfall 4 | [ASSUMED] — canonical с черновым доменом перезапишется в фазе 6; согласовать URL с пользователем |
 | A7 | View Transitions в spike проверяется на временной странице с ClientRouter (не в BaseLayout) | Anti-Patterns | [ASSUMED] — моя рекомендация; UI-SPEC запрещает клиентский JS в фазе 1, AC R5 требует проверку конструкции |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Все 6 вопросов закрыты механизмами в планах фазы 1: Q1 (мажор Astro) — чекпоинт 01-01 T1 (решение до любого npm install); Q2 (установка Stacki) — 01-06 Task 2 (fallback-цепочка: установщик v0.1.3 → сборка из исходников → ограничение окружения); Q3 (sitemap-index.xml) — решение 01-01 T4, проверки 01-02/01-04/01-05 используют `dist/sitemap-index.xml`; Q4 (site URL) — 01-01 T2 (черновой URL, замена в фазе 6); Q5 (имя/видимость репозитория) — 01-01 T3; Q6 (Node engines) — 01-03: `engines.node ">=22.22.3"` (перекрывает SPEC ">=22" и требования eslint-plugin-astro/astro 7).
 
 1. **Версия Astro: 7.1.6 (current stable) или ^5.18.2 (буква SPEC)?**
    - What we know: SPEC (2026-07-31) зафиксировал «latest stable 5.x», но npm `latest` = 7.1.6 (опубликован 2026-07-29), docs подтверждают «Astro v7 is here!»; 5.x закончился на 5.18.2. Интеграции peer-привязаны к мажору (mdx@7↔astro7, mdx@4↔astro5). Оба пути валидны для всех API фазы (content layer, strict, sitemap, mdx, ClientRouter).
