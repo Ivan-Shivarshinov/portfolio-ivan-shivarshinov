@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Базовые layouts и общий SEO-компонент работают: каждая страница получает title, description, canonical, Open Graph; sitemap генерируется.
   5. Существует документ о покрытии конструкций Astro в Stacki (итог spike: открытие проекта, чтение компонентов и props, variants, scoped styles, CSS variables, JSON-коллекции, frontmatter, View Transitions) — зафиксирован в Git до визуальной сборки.
 
-**Plans**: 3/7 plans executed
+**Plans**: 4/7 plans executed
 
 Plans:
 **Wave 1**
@@ -49,7 +49,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-04-PLAN.md — Контентный слой: content.config.ts (5 коллекций), JSON-данные, пустые коллекции, негативные фикстуры
+- [x] 01-04-PLAN.md — Контентный слой: content.config.ts (5 коллекций), JSON-данные, пустые коллекции, негативные фикстуры
 - [ ] 01-05-PLAN.md — Страницы-заглушки Work/Lab/About/Contact + robots.txt + SEO/preview-проверки
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -145,7 +145,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Основа проекта | 3/7 | In Progress|  |
+| 1. Основа проекта | 4/7 | In Progress|  |
 | 2. Визуальная система | TBD | Not started | - |
 | 3. Контент и страницы | TBD | Not started | - |
 | 4. Прототип индекса работ | TBD | Not started | - |

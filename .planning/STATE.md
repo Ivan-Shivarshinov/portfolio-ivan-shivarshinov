@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: osnova-proekta
 status: executing
-stopped_at: Completed 01-03-PLAN.md (Astro scaffold tracer)
-last_updated: "2026-08-01T21:23:05.929Z"
+stopped_at: Completed 01-04-PLAN.md (content layer)
+last_updated: "2026-08-01T21:37:22.915Z"
 last_activity: 2026-08-01
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 01 (osnova-proekta) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-08-01 — Phase 01 execution started
 
-Progress: [████░░░░░░] 43%
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [████░░░░░░] 43%
 | Phase 01 P01 | 12 | 4 tasks | 3 files |
 | Phase 01 P02 | 15 | 2 tasks | 5 files |
 | Phase 01 P03 | 12 | 3 tasks | 16 files |
+| Phase 01-osnova-proekta P04 | 20 | 1 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,7 @@ Progress: [████░░░░░░] 43%
 - [Phase 01]: [01-03 T2] Источник шрифтов — upstream-репозитории фаундри (floriankarsten/space-grotesk, JetBrains/JetBrainsMono): google/fonts GitHub больше не содержит WOFF2 (только вариативные TTF, подтверждено GitHub API). Все 3 файла валидны (wOF2). Потребители: фазы 2-3 (визуальная система).
 - [Phase 01]: [01-03 T2] space-grotesk-600.woff2 — вариативный SpaceGrotesk[wght].woff2: статичного SemiBold 600 нет ни в одном официальном источнике; инстанс 600 выбирается декларацией font-weight в @font-face (CSS Fonts 4).
 - [Phase 01]: [01-03 T3] check-prohibitions.mjs: точное совпадение для одиночных имён denylist + namespace-префиксы (@tailwindcss/, @unocss/, @angular/) — похожие имена (vuepress, react-test-renderer) не дают ложных срабатываний; пограничная фикстура в self-test. Потребитель: 01-07 (CI).
+- [Phase 01]: [01-04 T1] Дубликат slug/id обязан падать сборку (AC R3): в Astro 7.1.6 дефолтные glob()/file() только предупреждают (logger.warn + перезапись) — добавлены generateId для projects и strict-json-loader вместо file() (опровергнута RESEARCH A5). Потребители: фазы 2-3 (целостность коллекций).
 
 ### Pending Todos
 
@@ -103,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-01T21:23:05.917Z
-Stopped at: Completed 01-03-PLAN.md (Astro scaffold tracer)
+Last session: 2026-08-01T21:37:22.903Z
+Stopped at: Completed 01-04-PLAN.md (content layer)
 Resume file: None
