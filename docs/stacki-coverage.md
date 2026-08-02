@@ -19,17 +19,20 @@ Stacki понимает и как отображает. Гибридный пр�
 
 | Конструкция | Как проверить (путь в проекте) | Вердикт (проверено/ограничение) | Наблюдение |
 | --- | --- | --- | --- |
-| Компоненты | Открыть src/components/Seo.astro и src/layouts/BaseLayout.astro в Stacki — как отображаются компоненты | | |
-| Props | Seo.astro: props title, description, canonical?, ogImage? — видны ли props и их типы | | |
-| Variants | В фазе 1 вариантов нет (UI-SPEC Interaction NONE, компоненты без variant-логики) — что Stacki показывает для компонента без variants | | |
-| Scoped styles | BaseLayout.astro: scoped `<style>` активной ссылки навигации | | |
-| CSS-переменные | src/styles/tokens.css: --color-accent и остальные токены; потребление var(--color-accent) в BaseLayout (nav) и global.css (:focus-visible) | | |
-| JSON-коллекции | src/data/services.json, skills.json, tools.json — отображаются ли записи коллекций | | |
-| Frontmatter | src/pages/*.astro: блок --- --- (title, description) — виден ли frontmatter | | |
-| View Transitions | src/pages/_spike-vt.astro: ClientRouter из astro:transitions, ссылка с transition:name="page" | | |
-| Краевой случай: scoped style и CSS-переменная одновременно | BaseLayout.astro: `nav a[aria-current='page'] { color: var(--color-accent) }` — scoped-правило, потребляющее токен | | |
-| Краевой случай: коллекция с 0 записей | src/content/notes — 0 записей (в папке только .gitkeep) | | |
+| Компоненты | Открыть src/components/Seo.astro и src/layouts/BaseLayout.astro в Stacki — как отображаются компоненты | проверено | Оба компонента (Seo.astro и BaseLayout.astro) видны как компоненты в визуальном редакторе |
+| Props | Seo.astro: props title, description, canonical?, ogImage? — видны ли props и их типы | проверено | Props Seo видны (title, description) |
+| Variants | В фазе 1 вариантов нет (UI-SPEC Interaction NONE, компоненты без variant-логики) — что Stacki показывает для компонента без variants | проверено | У Seo (компонент без variants) секции вариантов нет; у BaseLayout в списке вариантов есть запись «baselayout» — по наблюдению это сам лейаут, а не variants-конструкция (интерпретация списка требует осторожности) |
+| Scoped styles | BaseLayout.astro: scoped `<style>` активной ссылки навигации | проверено | Внутри baselayout виден кодовый элемент styles с точным содержимым: `nav a[aria-current='page'] { color: var(--color-accent); }` (включая комментарий про spike R5) |
+| CSS-переменные | src/styles/tokens.css: --color-accent и остальные токены; потребление var(--color-accent) в BaseLayout (nav) и global.css (:focus-visible) | ограничение | Визуальной панели переменных (как в Webflow) нет; CSS-переменные видны только внутри кодового элемента styles (см. Scoped styles). Отдельного визуального отображения токенов нет |
+| JSON-коллекции | src/data/services.json, skills.json, tools.json — отображаются ли записи коллекций | проверено | Видны 3 коллекции с данными: Services, Skills, Tools |
+| Frontmatter | src/pages/*.astro: блок --- --- (title, description) — виден ли frontmatter | проверено | Блок кода в верху дерева виден |
+| View Transitions | src/pages/_spike-vt.astro: ClientRouter из astro:transitions, ссылка с transition:name="page" | ограничение | Элемента spike-vt и какого-либо отображения transition в визуальном редакторе не найдено |
+| Краевой случай: scoped style и CSS-переменная одновременно | BaseLayout.astro: `nav a[aria-current='page'] { color: var(--color-accent) }` — scoped-правило, потребляющее токен | проверено | Правило `nav a[aria-current='page'] { color: var(--color-accent) }` видно целиком (то же наблюдение, что и в Scoped styles) |
+| Краевой случай: коллекция с 0 записей | src/content/notes — 0 записей (в папке только .gitkeep) | ограничение | Пустая Notes не отображается; в списке коллекций только 3 с данными (Services, Skills, Tools) |
 
 ## Ограничения
 
-(заполняется после прогона)
+- Нет визуальной панели CSS-переменных (аналог Webflow): токены видны только внутри кодового элемента styles компонента; отдельного визуального представления дизайн-токенов нет.
+- View Transitions не отображаются в визуальном редакторе: spike-страница (_spike-vt.astro, ClientRouter, transition:name) в редакторе не найдена — конструкция остаётся кодовым режимом.
+- Пустые коллекции (0 записей) скрыты из списка коллекций: Notes не отображается, пока в коллекции нет данных.
+- Список вариантов может содержать запись, не являющуюся variants-конструкцией: у BaseLayout в списке вариантов есть «baselayout» (сам лейаут) — интерпретация секции вариантов требует осторожности.
