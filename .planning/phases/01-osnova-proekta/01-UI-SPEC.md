@@ -24,7 +24,7 @@ reviewed_at: 2026-08-01
 | Preset | not applicable |
 | Component library | none — Astro components only (layout, SEO); visual component library is Phase 2 |
 | Icon library | none — no icons in Phase 1 (design SPEC §07: minimal functional signs only, from Phase 2) |
-| Font | Space Grotesk (grotesk: body + headings) + JetBrains Mono (mono: indexes, roles, dates, statuses, technical data) — user decision 2026-08-01; local WOFF2 in `public/fonts`, `font-display: swap` (CONTEXT D-03) |
+| Font | Manrope (body) + Unbounded (display/headings) + JetBrains Mono (mono: indexes, roles, dates, statuses, technical data) — user decision 2026-08-02 replaces D-03 (2026-08-01); local WOFF2 in `public/fonts`, `font-display: swap` |
 | Theme | Light only (v1) — design SPEC §07: «нейтральная светлая или слегка тёплая основа»; no dark theme in scope |
 
 Notes:
@@ -40,7 +40,7 @@ Notes:
 | `src/layouts/BaseLayout.astro` | Common chrome: `<head>` (title/description/canonical/OG via Seo), header with site nav (Work/Lab/About/Contact), footer. No visual styling |
 | `src/components/Seo.astro` | Props: title, description, canonical, ogImage (SPEC R4); 5 unique title+description pairs, canonical + OG on every page |
 | Pages | `index.astro`, `work.astro`, `lab.astro`, `about.astro`, `contact.astro` — Home + 4 placeholders, all using BaseLayout (SPEC R1) |
-| Fonts | `public/fonts/*.woff2`: Space Grotesk 400/600, JetBrains Mono 400; `@font-face` with `font-display: swap` |
+| Fonts | `public/fonts/*.woff2`: Manrope + Unbounded variable subsets (latin/latin-ext/cyrillic/cyrillic-ext), JetBrains Mono 400; `@font-face` with `font-display: swap` |
 | Interaction | NONE in Phase 1 — static render only; only global baseline is the visible focus ring. Motion order for later phases: CSS → vanilla JS → View Transitions → island (STATE Decisions) |
 
 ---
@@ -69,12 +69,13 @@ Token names: `--space-xs` … `--space-3xl` in `src/styles/tokens.css`. If the S
 
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
-| Body | 16px | 400 | 1.5 | Space Grotesk (`--font-sans`) |
+| Body | 16px | 400 | 1.5 | Manrope (`--font-sans`) |
 | Label / Meta | 14px | 400 | 1.4 (mono exception) | JetBrains Mono (`--font-mono`) — reserved for indexes, roles, dates, statuses, technical data (design SPEC §07) |
-| Heading | 20px | 600 | 1.2 | Space Grotesk |
-| Display | 32px | 600 | 1.2 | Space Grotesk |
+| Heading | 20px | 600 | 1.2 | Unbounded (`--font-display`) |
+| Display | 32px | 600 | 1.2 | Unbounded (`--font-display`) |
 
-- Exactly 2 weights (400 regular, 600 semibold), 4 sizes. Baseline values — Phase 2 refines the visual treatment without renaming tokens.
+- Manrope variable 400–800 (body), Unbounded variable 400–900 (display/headings), JetBrains Mono static 400 (mono layer), 4 sizes. Baseline values — Phase 2 refines the visual treatment without renaming tokens.
+- Font replacement (2026-08-02, replaces D-03 from 2026-08-01): Space Grotesk has NO Cyrillic (Google Fonts metadata subsets: latin, latin-ext, vietnamese — 0 cyrillic); site copy is Russian (CONTEXT D-08), so Cyrillic fell back to system fonts. Manrope + Unbounded both ship full Cyrillic (verified with fontTools cmap on the downloaded WOFF2 files: А-я, Ё/ё, № present). JetBrains Mono verified full Cyrillic — unchanged.
 - Token names: `--text-body`, `--text-label`, `--text-heading`, `--text-display` (+ size/weight/line-height variables per role).
 - Body line height 1.5; heading line height 1.2 (user-confirmed defaults). Label 1.4 is a declared mono-metadata exception, not an accident.
 - Mono is a semantic layer, not decoration: it must not be used for body copy.
