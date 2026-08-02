@@ -1,0 +1,132 @@
+---
+// Nav.astro — навигация оболочки (D-01, D-02, D-06, W1): моно-слой
+// «номера и подписи» — индексы 01–05, русские метки, тонкие разделители
+// (1px var(--color-line)); имя в header — ссылка на / (D-02).
+// Активный маршрут — accent для индекса и лейбла (D-01), ровно один
+// aria-current="page" на страницу (W1; нормализация pathname — фикс W1 фазы 1).
+// <768px: индексы/разделители/полные лейблы скрыты, «Главная» — через имя,
+// «Лаборатория»→«Лаб» (UI-SPEC Copywriting — одна строка без горизонтального скролла).
+const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+const ROUTES = [
+  { href: '/', label: 'Главная', short: 'Главная', index: '01' },
+  { href: '/work', label: 'Работы', short: 'Работы', index: '02' },
+  { href: '/lab', label: 'Лаборатория', short: 'Лаб', index: '03' },
+  { href: '/about', label: 'Обо мне', short: 'Обо мне', index: '04' },
+  { href: '/contact', label: 'Контакты', short: 'Контакты', index: '05' },
+];
+---
+
+<div class="nav">
+  <a class="nav__name" href="/">Иван Шиваршинов</a>
+  <nav class="nav__menu" aria-label="Основная навигация">
+    <ul class="nav__list">
+      {ROUTES.map((r) => (
+        <li class="nav__item">
+          <a
+            class="nav__link"
+            href={r.href}
+            aria-current={pathname === r.href ? 'page' : undefined}
+          >
+            <span class="nav__index">{r.index}</span>
+            <span class="nav__label nav__label--full">{r.label}</span>
+            <span class="nav__label nav__label--short">{r.short}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>
+
+<style>
+  /* Моно-слой навигации: имя и пункты — JetBrains Mono 14px (UI-SPEC Typography Label) */
+  .nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding-block: var(--space-md);
+  }
+  .nav__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .nav__name:hover {
+    color: var(--color-ink);
+  }
+  .nav__list {
+    display: flex;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav__item {
+    display: flex;
+    align-items: center;
+  }
+  .nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding-block: var(--space-md); /* hit area ≥44px (UI-SPEC Spacing) */
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+  .nav__link:hover {
+    color: var(--color-ink);
+  }
+  /* Активный маршрут: accent для индекса и лейбла (D-01) */
+  .nav__link[aria-current='page'] {
+    color: var(--color-accent);
+  }
+  /* Мобильное состояние (<768px): без индексов и разделителей, короткие лейблы,
+     «Главная» скрыта — имя в header несёт маршрут / (UI-SPEC Copywriting) */
+  .nav__index,
+  .nav__label--full,
+  .nav__item + .nav__item::before {
+    display: none;
+  }
+  .nav__label--short {
+    display: inline;
+  }
+  .nav__link[href='/'] {
+    display: none;
+  }
+  /* Десктоп (≥768px = --bp-md, min-width включительно — AC R6) */
+  @media (min-width: 768px) {
+    .nav {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav__index {
+      display: inline;
+    }
+    .nav__label--full {
+      display: inline;
+    }
+    .nav__label--short {
+      display: none;
+    }
+    .nav__link[href='/'] {
+      display: inline-flex;
+    }
+    /* Тонкий разделитель между пунктами (1px — вне шкалы, разрешено) */
+    .nav__item + .nav__item::before {
+      content: '';
+      display: block;
+      width: 1px;
+      height: var(--text-label);
+      margin-inline: var(--space-xs);
+      background: var(--color-line);
+    }
+  }
+</style>

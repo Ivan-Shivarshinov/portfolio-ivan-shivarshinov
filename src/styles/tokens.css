@@ -8,6 +8,13 @@
   --color-accent: #A84B32;
   --color-accent-ink: #FFFFFF;
   --color-destructive: #B3261E;
+  --color-line: #DAD9D3;
+
+  /* project accents — theme enum (D-07) */
+  --project-clay: #8A5A44;
+  --project-olive: #6B6B3F;
+  --project-slate: #55606E;
+  --project-plum: #6E4A5C;
 
   /* typography */
   --font-sans: 'Manrope', system-ui, sans-serif;
@@ -16,7 +23,9 @@
   --text-body: 16px;
   --text-label: 14px;
   --text-heading: 20px;
-  --text-display: 32px;
+  --text-display: clamp(28px, 5vw, 40px);
+  --text-lead: 18px;
+  --text-caption: 12px;
 
   /* spacing */
   --space-xs: 4px;
@@ -37,4 +46,10 @@
   --motion-base: 250ms;
   --motion-slow: 400ms;
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* bp */
+  --bp-md: 768px;
+  --bp-lg: 1200px;
 }

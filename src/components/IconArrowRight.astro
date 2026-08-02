@@ -1,0 +1,26 @@
+---
+// IconArrowRight.astro — стрелка вправо (D-09/D-10/D-11): сетка 24 единиц
+// viewBox, stroke 2, currentColor, aria-hidden; геометрический path — прямые
+// линии и квадратный угол ломаной (язык «прямоугольные плоскости, тонкие линии»).
+interface Props {
+  size?: number;
+}
+
+const { size = 24 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+>
+  <path d="M4 12h12" />
+  <path d="M13 5l7 7-7 7" />
+</svg>

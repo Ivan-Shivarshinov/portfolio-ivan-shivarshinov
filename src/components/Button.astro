@@ -1,0 +1,62 @@
+---
+// Button.astro — действие оболочки (R3, R4): моно-лейбл 14px, слот для иконки.
+// primary — accent-заливка (слот акцента разрешён с фазы 2, UI-SPEC 01),
+// hover — color-mix с ink 8% (oklab — предсказуемое смешение, RESEARCH Pattern 4),
+// active — translate 0 1px (compositor-only, без layout-свойств).
+// Отступы — только var(--space-*); переходы — только motion/ease-токены.
+interface Props {
+  variant?: 'primary' | 'secondary';
+  density?: 'md' | 'lg';
+  href: string;
+}
+
+const { variant = 'primary', density = 'md', href } = Astro.props;
+---
+
+<a class="button button--{variant} button--{density}" href={href}>
+  <slot />
+</a>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    text-decoration: none;
+    transition:
+      background-color var(--motion-fast) var(--ease-standard),
+      border-color var(--motion-fast) var(--ease-standard),
+      color var(--motion-fast) var(--ease-standard);
+  }
+  .button--primary {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .button--primary:hover {
+    background: color-mix(in oklab, var(--color-accent), var(--color-ink) 8%);
+  }
+  .button--primary:active {
+    translate: 0 1px; /* 1px — compositor-only сдвиг, вне шкалы отступов */
+  }
+  .button--secondary {
+    background: transparent;
+    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    color: var(--color-ink);
+  }
+  .button--secondary:hover {
+    border-color: var(--color-ink);
+    color: var(--color-accent);
+  }
+  .button--secondary:active {
+    translate: 0 1px;
+  }
+  .button--md {
+    padding: var(--space-sm) var(--space-md);
+  }
+  .button--lg {
+    padding: var(--space-md) var(--space-lg);
+  }
+</style>

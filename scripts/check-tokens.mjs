@@ -45,8 +45,10 @@ const TOKENS_PATH = 'src/styles/tokens.css';
 const SCAN_DIRS = ['src/styles', 'src/components'];
 const SCAN_EXTS = ['.css', '.astro'];
 
-// CSS-переменная: --имя: (в определении, не в var(--имя))
-const VAR_DEF_RE = /--[a-z0-9][a-z0-9-]*\s*:/i;
+// CSS-переменная: --имя: (в определении, не в var(--имя)).
+// Lookbehind (?<![\w.-]) исключает BEM-модификаторы вида .button--primary:hover
+// (перед «--» стоит точка) — ложное срабатывание на классах-модификаторах (02-03 T1).
+const VAR_DEF_RE = /(?<![\w.-])--[a-z0-9][a-z0-9-]*\s*:/i;
 // hex-литералы цветов: #RGB / #RRGGBB / #RRGGBBAA с границами по word-символам
 const HEX_RE = /(?<![\w-])#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})(?![\w-])/;
 // px-значения шкалы отступов (1-2px вне шкалы — не нарушение)

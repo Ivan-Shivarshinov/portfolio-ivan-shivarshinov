@@ -1,26 +1,24 @@
 ---
 // BaseLayout — общий каркас страниц: head-контракт делегируется Seo.astro,
 // тело — <slot /> для плоского списка self-closing компонентов (D-04).
+// Оболочка фазы 2: <Nav /> + <Footer /> вместо inline-разметки; моно-метка
+// страницы (D-05) над контентом; контейнер: max-width var(--container-max),
+// gutter var(--gutter-mobile) → var(--gutter-desktop) на ≥768px (R6).
 import '../styles/tokens.css';
 import '../styles/global.css';
 import Seo from '../components/Seo.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
   description: string;
+  pageLabel?: string;
 }
 
-const { title, description } = Astro.props;
-// Текущий путь — для пометки активной ссылки навигации (aria-current="page").
-// Акцент для активного состояния nav — единственное разрешённое применение
-// accent-токена в фазе 1 (UI-SPEC 01: «Accent reserved for: active nav state
-// and the :focus-visible ring only in Phase 1»). Scoped-конструкция добавлена
-// для spike R5 (01-06): компонент со scoped style и CSS-переменной одновременно —
-// краевой случай 1 чек-листа docs/stacki-coverage.md.
-// Астро отдаёт pathname статических маршрутов с завершающим слэшем (/work/),
-// поэтому нормализуем его перед сравнением (verification W1); для корня
-// («/») нормализация даёт пустую строку — возвращаем «/» через fallback.
-const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const { title, description, pageLabel } = Astro.props;
+// Latin-метка раздела для Footer: последний сегмент метки («01 / HOME» → 'HOME').
+const sectionLabel = pageLabel?.split(' ').at(-1);
 ---
 <!doctype html>
 <html lang="ru">
@@ -30,26 +28,40 @@ const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
     <Seo title={title} description={description} />
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</a>
-        <a href="/work" aria-current={pathname === '/work' ? 'page' : undefined}>Work</a>
-        <a href="/lab" aria-current={pathname === '/lab' ? 'page' : undefined}>Lab</a>
-        <a href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>About</a>
-        <a href="/contact" aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a>
-      </nav>
+    <header class="shell__header">
+      <Nav />
     </header>
-    <main>
+    <main class="shell__main">
+      {pageLabel && <p class="page-label">{pageLabel}</p>}
       <slot />
     </main>
-    <footer></footer>
+    {sectionLabel && <Footer sectionLabel={sectionLabel} />}
   </body>
 </html>
 
 <style>
-  /* Scoped-стиль навигации (точка проверки Stacki, spike R5): активная ссылка
-     использует CSS-переменную var(--color-accent) из tokens.css. */
-  nav a[aria-current='page'] {
-    color: var(--color-accent);
+  /* Общий контейнер оболочки: header и main — одна колонка на контракте R6 */
+  .shell__header,
+  .shell__main {
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter-mobile);
+  }
+  @media (min-width: 768px) {
+    .shell__header,
+    .shell__main {
+      padding-inline: var(--gutter-desktop);
+    }
+  }
+  .shell__main {
+    padding-block: var(--space-xl) var(--space-3xl);
+  }
+  /* Моно-метка страницы «01 / HOME» над контентом (D-05) */
+  .page-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin-block: 0 var(--space-lg);
   }
 </style>

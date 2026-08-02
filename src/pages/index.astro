@@ -1,13 +1,40 @@
 ---
-// index.astro — маршрут /; статичный контент без клиентского JS (UI-SPEC Interaction NONE).
-// Primary CTA «Смотреть работы» намеренно не рендерится в фазе 1 (scaffolding-only,
-// UI-SPEC Color: акцент и primary CTA — только с фазы 2 визуальной сборки).
+// index.astro — маршрут /; hero-shell фазы 2 (D-13): моно-метка «01 / HOME»,
+// имя в Unbounded display, primary CTA «Смотреть работы» → /work с иконкой
+// IconArrowRight. Текст формулы обещания и подписей — фаза 3 (REQ-main-promise);
+// CTA — единственное место первичного действия. Без клиентского JS (UI-SPEC).
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import IconArrowRight from '../components/IconArrowRight.astro';
 ---
 <BaseLayout
   title="Иван Шиваршинов — веб-разработчик с продуктовым подходом"
   description="Создаю и развиваю сложные сайты, контентные системы и веб-инструменты."
+  pageLabel="01 / HOME"
 >
-  <h1>Иван Шиваршинов</h1>
-  <p>Фаза 2 — визуальная система</p>
+  <section class="hero">
+    <h1 class="hero__name">Иван Шиваршинов</h1>
+    <Button href="/work" density="lg">
+      Смотреть работы
+      <IconArrowRight />
+    </Button>
+  </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xl);
+  }
+  /* Имя hero: display-типографика (D-13, UI-SPEC Typography Display);
+     clamp(28px, 5vw, 40px) — на 320px «Шиваршинов» ≈231px < 272px колонки */
+  .hero__name {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 600;
+    line-height: 1.2;
+    max-width: 100%;
+  }
+</style>
