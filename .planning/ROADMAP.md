@@ -72,7 +72,7 @@ Plans:
   3. В спокойном состоянии интерфейс выглядит нейтральным и профессиональным; акценты, цвета проектов и движение проявляются только во взаимодействии.
   4. Компоненты адаптивны: сетка складывается, отступы масштабируются, изображения обрабатываются — на mobile без дублирования стилей и без потери содержания.
 
-**Plans**: 4/6 plans executed
+**Plans**: 5/6 plans executed
 
 Plans:
 **Wave 1**
@@ -90,7 +90,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-05-PLAN.md — work.astro SYSTEM DEMO (grep-usage) + docs/hero-concept.md (R9) + первый полный зелёный verify
+- [x] 02-05-PLAN.md — work.astro SYSTEM DEMO (grep-usage) + docs/hero-concept.md (R9) + первый полный зелёный verify
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
-| 2. Визуальная система | 4/6 | In Progress|  |
+| 2. Визуальная система | 5/6 | In Progress|  |
 | 3. Контент и страницы | TBD | Not started | - |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |
