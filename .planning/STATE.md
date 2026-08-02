@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: vizualnaya-sistema
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-08-02T21:24:01.335Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-08-02T21:38:29.666Z"
 last_activity: 2026-08-02
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 02 (vizualnaya-sistema) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-08-02 — Phase 02 execution started
 
-Progress: [████████░░] 77%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [████████░░] 77%
 | Phase 02 P01 | 18 | 2 tasks | 4 files |
 | Phase 02 P02 | 10 | 2 tasks | 1 files |
 | Phase 02-vizualnaya-sistema P03 | 14 | 2 tasks | 14 files |
+| Phase 02-vizualnaya-sistema P04 | 10 | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Progress: [████████░░] 77%
 - [Phase ?]: 02-03 T1: check-tokens VAR_DEF_RE дополнен lookbehind (?<![\w.-]) — исключение BEM-модификаторов .class--mod: из правила «единый файл токенов» (Rule 1, ложные срабатывания на .button--primary:hover)
 - [Phase ?]: 02-03 T1: sectionLabel Footer выводится из pageLabel (split(' ').at(-1)) — единый источник Latin-метки раздела без дублирования
 - [Phase ?]: 02-03 T1: Footer держит собственный контейнер (max-width + gutter-токены + media 768px) — компонент сам отвечает за свою сетку (ADR §5.4)
+- [Phase ?]: [02-04 T1] Кавычки frontmatter в новых .astro — одинарные (repo-конвенция Nav/Button/IconArrowRight); prettier --write на .astro не применяется: prettier --check падает на всех существующих файлах, CI его не запускает (только eslint+check+build)
+- [Phase ?]: [02-04 T2] ProjectCard: добавлена обёртка .card__body (title+meta+footer) — CSS плана для split («текстовая часть — flex: 1») требует контейнера текстовой части; без обёртки flex-row split разложил бы 4 дочерних элемента в 4 колонки
+- [Phase ?]: [02-04 T2] ACCENTS в ProjectCard с кавыченными ключами ('terracotta': ...) — verify-строка плана проверяет буквально «'terracotta': 'var(--color-accent)'»; значения идентичны маппингу Tag (семантически тот же контракт, оформление ключей разное)
 
 ### Pending Todos
 
@@ -128,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-02T21:24:01.320Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-08-02T21:38:29.651Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
