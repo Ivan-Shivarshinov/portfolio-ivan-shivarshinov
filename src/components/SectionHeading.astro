@@ -1,0 +1,56 @@
+---
+// SectionHeading.astro — заголовок раздела (R3): моно-надзаголовок «номера и
+// подписи» (D-05) над Unbounded-заголовком; layout 'split' — на ≥768px мета
+// слева, title справа (row + space-between). Адаптивность живёт в компоненте
+// (ADR §5.4); число медиа-запроса равно --bp-md (сверяет check-tokens).
+interface Props {
+  meta?: string;
+  title: string;
+  layout?: "stacked" | "split";
+}
+
+const { meta, title, layout = "stacked" } = Astro.props;
+const isSplit = layout === "split";
+---
+
+<div class={`section-heading${isSplit ? " section-heading--split" : ""}`}>
+  {meta && <p class="sh-meta">{meta}</p>}
+  <h2 class="sh-title">{title}</h2>
+</div>
+
+<style>
+  .section-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  /* Моно-надзаголовок: «номера и подписи» (D-05) */
+  .sh-meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+  /* Title переносится без обрезания (overflow-wrap, UI-SPEC long-text) */
+  .sh-title {
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+  /* split: базовое состояние — stacked (meta над title) */
+  .section-heading--split {
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .section-heading--split {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-lg);
+    }
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+// Media.astro — медиа-оболочка (R7): figure + рамка с aspect-ratio по пропу
+// ratio, слот для <Image /> фазы 3; без изображения рендерится пустая рамка
+// с ratio (edge R7). Контент не раздувает ratio: overflow hidden + min-height
+// 0 (Pitfall 3). Caption — моно-слой (--text-caption, --color-ink-muted).
+interface Props {
+  ratio?: "16:9" | "4:3" | "3:2" | "1:1";
+  caption?: string;
+}
+
+const { ratio = "4:3", caption } = Astro.props;
+
+const RATIOS: Record<"16:9" | "4:3" | "3:2" | "1:1", string> = {
+  "16:9": "16 / 9",
+  "4:3": "4 / 3",
+  "3:2": "3 / 2",
+  "1:1": "1 / 1",
+};
+---
+
+<figure class="media">
+  <div class="media__frame" style={{ "--ratio": RATIOS[ratio] }}>
+    <slot />
+  </div>
+  {caption && <figcaption class="media__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .media {
+    margin: 0;
+  }
+  .media__frame {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    min-height: 0; /* контент не раздувает ratio (Pitfall 3) */
+    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    transition: border-color var(--motion-base) var(--ease-standard);
+  }
+  .media__frame:hover {
+    border-color: var(--color-ink-muted);
+  }
+  .media__caption {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin-top: var(--space-xs);
+  }
+</style>
