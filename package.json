@@ -11,9 +11,11 @@
     "check": "astro check",
     "check-seo": "node scripts/check-seo.mjs",
     "check-tokens": "node scripts/check-tokens.mjs",
+    "check-contrast": "node scripts/check-contrast.mjs",
+    "check-theme": "node scripts/check-theme.mjs",
     "check-collections": "node scripts/check-collections.mjs",
     "check-spike-doc": "node scripts/check-spike-doc.mjs",
-    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-collections && node scripts/check-prohibitions.mjs"
+    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-contrast && npm run check-collections && node scripts/check-prohibitions.mjs"
   },
   "engines": {
     "node": ">=22.22.3"
