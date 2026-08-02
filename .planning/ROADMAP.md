@@ -72,7 +72,30 @@ Plans:
   3. В спокойном состоянии интерфейс выглядит нейтральным и профессиональным; акценты, цвета проектов и движение проявляются только во взаимодействии.
   4. Компоненты адаптивны: сетка складывается, отступы масштабируются, изображения обрабатываются — на mobile без дублирования стилей и без потери содержания.
 
-**Plans**: TBD
+**Plans**: 6/6 plans created (not executed)
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Валидационный каркас Wave 0: расширение check-tokens (bp-группа, media-query сверка, transition-grep, W1-ассерт, grep-использование, 0 script), новый check-contrast, negative-фикстура theme, verify-цепочка
+- [ ] 02-02-PLAN.md — Решения фазы: hex палитры проектов (D-07) + выбор концепта первого экрана (R9) (2 чекпоинта)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-03-PLAN.md — Tracer: оболочка системы end-to-end (tokens 6 групп, kill-switch, Nav/Footer/Button/Link/IconArrowRight, BaseLayout, index hero D-13, 4 empty-state страницы)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-04-PLAN.md — Компонентная библиотека: SectionHeading, Tag, Media, ProjectCard (theme-контракт + negative-фикстура), 9 иконок
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 02-05-PLAN.md — work.astro SYSTEM DEMO (grep-usage) + docs/hero-concept.md (R9) + первый полный зелёный verify
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 02-06-PLAN.md — Финальный гейт: verify + CI зелёный + визуальный проход 320/375/768/1200 (reduced-motion, нейтральный покой)
+
 **UI hint**: yes
 
 ### Phase 3: Контент и страницы
@@ -146,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
-| 2. Визуальная система | TBD | Not started | - |
+| 2. Визуальная система | 0/6 | Not started | - |
 | 3. Контент и страницы | TBD | Not started | - |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |
