@@ -6,7 +6,7 @@ current_phase: 02
 current_phase_name: vizualnaya-sistema
 status: executing
 stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-08-02T21:07:05.174Z"
+last_updated: "2026-08-02T21:07:54.217Z"
 last_activity: 2026-08-02
 last_activity_desc: Phase 02 execution started
 progress:
@@ -101,6 +101,7 @@ Progress: [██████░░░░] 62%
 - [Phase ?]: 02-01 T1: grep-контроль использования компонентов пропускается с предупреждением при отсутствии файлов в src/pages|src/layouts (guard-паттерн как для dist)
 - [Phase ?]: 02-01 T2: check-theme не включён в verify-цепочку — требует собранного ProjectCard и дублирует astro check; реальный прогон в 02-04 Task 2
 - [Phase ?]: 02-02: Принята палитра проектов (вариант palette-research, D-07/D-08): clay #8A5A44, olive #6B6B3F, slate #55606E, plum #6E4A5C; терракота #A84B32 — системный accent (locked, не переопределяется); enum-имена terracotta/clay/olive/slate/plum не пересматриваются (costly-контракт D-07, схема projects фазы 3). Потребитель: 02-03 Task 1 — значения --project-* в tokens.css; контраст ≥ 4.5:1 на bg/surface проверяется check-contrast (02-03).
+- [Phase ?]: 02-02: Первый экран (index.astro) — дефолт D-12 «контрактная типографика» (вариант hero-default; Figma MCP в сессии планирования недоступен — RESEARCH A2, пользователь не передал ссылки/скриншоты): моно-метка «01 / HOME» + имя (Unbounded display) + primary CTA Button «Смотреть работы» (D-13-минимум). Фиксируется в docs/hero-concept.md (02-05 Task 2) с обоснованием по критериям D-14; задел под фазу 3 без перекомпоновки (D-12). Потребитель: 02-05 Task 2 (docs/hero-concept.md), 02-03 Task 1 (рендер дефолта на главной).
 
 ### Pending Todos
 
