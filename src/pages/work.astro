@@ -1,35 +1,65 @@
 ---
-// work.astro — маршрут /work; оболочка фазы 2: моно-метка «02 / WORK» (D-05)
-// + empty-state D-04 (честный статус «раздел в разработке»). Реальный контент
-// (кейсы) — фаза 3. Title/description — уникальная пара R4.
+// work.astro — маршрут /work; SYSTEM DEMO-блок фазы 2 (UI-SPEC Page structure):
+// SectionHeading «SYSTEM DEMO / системная демонстрация» + фикстурные ProjectCard
+// с Media и Tag — последний узел grep-контроля использования компонентов
+// (check-tokens R3), после него полный verify зелёный. Фикстурные пропы — только
+// фаза 2 (AC#7): реальные кейсы из content collections приходят в фазе 3,
+// content.config.ts не изменяется.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Link from '../components/Link.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Media from '../components/Media.astro';
+import Tag from '../components/Tag.astro';
 ---
 <BaseLayout
   title="Работы — Иван Шиваршинов"
   description="Кейсы веб-разработки: от простых сайтов до контентных систем и веб-инструментов."
   pageLabel="02 / WORK"
 >
-  <div class="empty-state">
-    <p class="empty-state__caption">WORK — раздел в разработке</p>
-    <Link href="/">На главную</Link>
-  </div>
+  <section class="system-demo">
+    <SectionHeading meta="SYSTEM DEMO" title="Системная демонстрация" layout="split" />
+    <!-- Фикстурные карточки — рабочая версия фазы 2 (AC#7); // fixture: replaced in phase 3 -->
+    <div class="system-demo__list">
+      <ProjectCard
+        title='Проект «Терракота»'
+        meta='дизайн · 2026'
+        theme='terracotta'
+        showMetrics={true}
+        layout='stacked'
+      >
+        <Media slot="media" ratio="4:3" caption="Превью проекта — фаза 3" />
+        <Tag label="Web" theme="terracotta" />
+        <Tag label="CMS" />
+      </ProjectCard>
+      <ProjectCard
+        title='Проект «Олива»'
+        meta='разработка · 2026'
+        theme='olive'
+        showMetrics={false}
+        layout='split'
+      >
+        <Media slot="media" ratio="3:2" />
+        <Tag label="Astro" />
+      </ProjectCard>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .empty-state {
+  .system-demo {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
-    padding: var(--space-lg);
+    gap: var(--space-2xl);
   }
-  .empty-state__caption {
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    line-height: 1.4;
-    color: var(--color-ink-muted);
-    margin: 0;
+  .system-demo__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+  /* Число 768 = --bp-md (сверяет check-tokens): на ≥768px — 2 колонки карточек */
+  @media (min-width: 768px) {
+    .system-demo__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>
