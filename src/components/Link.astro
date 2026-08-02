@@ -1,0 +1,33 @@
+---
+// Link.astro — текстовая ссылка оболочки (R3, R4): нейтральный покой —
+// accent и подчёркивание появляются только во взаимодействии (hover/focus).
+// Внешние ссылки: caller передаёт target="_blank" rel="noopener" — в компоненте
+// не зашито (решает использование).
+interface Props {
+  variant?: 'default' | 'muted';
+  href: string;
+}
+
+const { variant = 'default', href } = Astro.props;
+---
+
+<a class="link link--{variant}" href={href}>
+  <slot />
+</a>
+
+<style>
+  .link {
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+  .link--muted {
+    color: var(--color-ink-muted);
+  }
+  .link:hover,
+  .link:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px; /* 2px — вне шкалы, разрешено */
+  }
+</style>

@@ -1,11 +1,35 @@
 ---
-// work.astro — маршрут /work; статичная страница-заглушка без клиентского JS (UI-SPEC Interaction NONE).
-// Title/description — уникальная пара R4; placeholder-текст — дословно из UI-SPEC Copywriting Contract.
+// work.astro — маршрут /work; оболочка фазы 2: моно-метка «02 / WORK» (D-05)
+// + empty-state D-04 (честный статус «раздел в разработке»). Реальный контент
+// (кейсы) — фаза 3. Title/description — уникальная пара R4.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Link from '../components/Link.astro';
 ---
 <BaseLayout
   title="Работы — Иван Шиваршинов"
   description="Кейсы веб-разработки: от простых сайтов до контентных систем и веб-инструментов."
+  pageLabel="02 / WORK"
 >
-  <p>Раздел в разработке — кейсы появятся в фазе 3</p>
+  <div class="empty-state">
+    <p class="empty-state__caption">WORK — раздел в разработке</p>
+    <Link href="/">На главную</Link>
+  </div>
 </BaseLayout>
+
+<style>
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    padding: var(--space-lg);
+  }
+  .empty-state__caption {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+</style>
