@@ -324,7 +324,7 @@ const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Контраст текста ≥ 4.5:1 | Ручная визуальная проверка пар | `scripts/check-contrast.mjs` (формула WCAG, self-tests) | 17 пар × глаза = ошибки; скрипт детерминирован и переиспользуется при каждом изменении токенов; формула — 10 строк (не нужен npm-пакет) |
+| Контраст текста ≥ 4.5:1 | Ручная визуальная проверка пар | `scripts/check-contrast.mjs` (формула WCAG, self-tests) | 20 пар × глаза = ошибки; скрипт детерминирован и переиспользуется при каждом изменении токенов; формула — 10 строк (не нужен npm-пакет) |
 | Сверка чисел media-query с bp-токенами | «Помнить» про 768/1200 при написании медиазапросов | Расширение `check-tokens.mjs` (regex-сверка) | Media-запросы не могут потреблять var() (constraint SPEC) — единственный механизм защиты — скрипт |
 | Reduced-motion baseline | Индивидуальные `@media (prefers-reduced-motion)` в каждом компоненте | Один глобальный kill-switch в global.css | Один источник; компоненты не могут «забыть» его; обновление в одном месте |
 | Hover-затемнение акцента | Ручной подбор второго hex + ещё токены | `color-mix(in oklab, var(--color-accent), var(--color-ink) 8%)` | Один токен акцента остаётся источником; без предпроцессора и дополнительных цветов |
@@ -511,22 +511,25 @@ const ratio = (a, b) => {
 | A5 | Stacki корректно отображает новые компоненты (плоский список self-closing) | Patterns | [CITED: docs/stacki-coverage.md] — проверено на Seo/BaseLayout (компоненты, props, scoped styles); новые компоненты следуют той же модели; варианты-списки в Stacki интерпретировать осторожно (запись «baselayout» в списке вариантов) |
 | A6 | eslint a11y-правила не включаются в фазе 2 | Security Domain | [CITED: STATE 01-03 T1] — jsx-a11y не установлен (peer-несовместимость eslint 10); a11y-качество держится на контрактах (aria-current, focus-visible, контраст) и quality gates фазы 6 |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Доступность Figma MCP на этапе планирования**
    - What we know: SPEC требует подключение remote-сервера на планировании (R9); в этой сессии MCP-инструмент не был доступен.
    - What's unclear: наличие токена/авторизации Figma у планировщика.
    - Recommendation: планировщик проверяет доступность MCP первым шагом; при отсутствии — фиксирует дефолт D-12 (контрактная типографика главной) и продолжает планирование без блокировки; выбор пользователя фиксируется в docs/hero-concept.md.
+   - **RESOLVED:** дефолт D-12 фиксируется решением 02-02 (выбор варианта первого экрана), применение и фиксация в docs/hero-concept.md — в 02-05; отсутствие MCP не блокирует фазу (см. Assumptions A2).
 
 2. **Где живёт W1-ассерт: в check-tokens или отдельным скриптом**
    - What we know: UI-SPEC inventory относит его к check-tokens («W1 assert»); ассерт требует dist (собранный HTML) — сейчас check-tokens работает только по src.
    - What's unclear: чистота разделения «токены (src)» vs «HTML (dist)» в одном скрипте.
    - Recommendation: по контракту UI-SPEC — расширение check-tokens: при отсутствии dist — проверка пропускается с предупреждением (не fail), в npm verify порядок build → check-tokens уже гарантирует dist.
+   - **RESOLVED:** W1-ассерт реализован внутри check-tokens (расширение по контракту UI-SPEC inventory) в 02-01 Task 1, реальный прогон по dist — в 02-03 Task 1 (см. Assumptions A3).
 
 3. **Точные значения пропов layout/density/showMetrics (Claude's Discretion)**
    - What we know: enum-множества заданы (stacked|split; md|lg; boolean), маппинг на токены обязателен (R3 AC).
    - What's unclear: детальные стили каждого варианта (density lg = padding sm/md — уже зафиксировано в UI-SPEC Component Contracts; остальное — реализация).
    - Recommendation: UI-SPEC Component Contracts уже фиксирует все пропсы и их значения — планировщик переносит их в планы как есть.
+   - **RESOLVED:** значения перенесены из UI-SPEC Component Contracts в планы как есть: SectionHeading layout (stacked|split, bp 768) — 02-04 Task 1, Button density (md|lg) — 02-03 Task 1, ProjectCard showMetrics — 02-04 Task 2 (см. Assumptions A4).
 
 ## Environment Availability
 
