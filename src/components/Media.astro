@@ -4,22 +4,22 @@
 // с ratio (edge R7). Контент не раздувает ratio: overflow hidden + min-height
 // 0 (Pitfall 3). Caption — моно-слой (--text-caption, --color-ink-muted).
 interface Props {
-  ratio?: "16:9" | "4:3" | "3:2" | "1:1";
+  ratio?: '16:9' | '4:3' | '3:2' | '1:1';
   caption?: string;
 }
 
-const { ratio = "4:3", caption } = Astro.props;
+const { ratio = '4:3', caption } = Astro.props;
 
-const RATIOS: Record<"16:9" | "4:3" | "3:2" | "1:1", string> = {
-  "16:9": "16 / 9",
-  "4:3": "4 / 3",
-  "3:2": "3 / 2",
-  "1:1": "1 / 1",
+const RATIOS: Record<'16:9' | '4:3' | '3:2' | '1:1', string> = {
+  '16:9': '16 / 9',
+  '4:3': '4 / 3',
+  '3:2': '3 / 2',
+  '1:1': '1 / 1',
 };
 ---
 
 <figure class="media">
-  <div class="media__frame" style={{ "--ratio": RATIOS[ratio] }}>
+  <div class="media__frame" style={{ '--ratio': RATIOS[ratio] }}>
     <slot />
   </div>
   {caption && <figcaption class="media__caption">{caption}</figcaption>}

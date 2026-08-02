@@ -6,14 +6,14 @@
 interface Props {
   meta?: string;
   title: string;
-  layout?: "stacked" | "split";
+  layout?: 'stacked' | 'split';
 }
 
-const { meta, title, layout = "stacked" } = Astro.props;
-const isSplit = layout === "split";
+const { meta, title, layout = 'stacked' } = Astro.props;
+const isSplit = layout === 'split';
 ---
 
-<div class={`section-heading${isSplit ? " section-heading--split" : ""}`}>
+<div class={`section-heading${isSplit ? ' section-heading--split' : ''}`}>
   {meta && <p class="sh-meta">{meta}</p>}
   <h2 class="sh-title">{title}</h2>
 </div>

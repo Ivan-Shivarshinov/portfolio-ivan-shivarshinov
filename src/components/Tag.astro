@@ -6,27 +6,24 @@
 // компонент содержит только маппинг enum → var() (check-tokens).
 interface Props {
   label: string;
-  theme?: "terracotta" | "clay" | "olive" | "slate" | "plum";
-  size?: "sm" | "md";
+  theme?: 'terracotta' | 'clay' | 'olive' | 'slate' | 'plum';
+  size?: 'sm' | 'md';
 }
 
-const { label, theme, size = "sm" } = Astro.props;
+const { label, theme, size = 'sm' } = Astro.props;
 
-const ACCENTS: Record<
-  "terracotta" | "clay" | "olive" | "slate" | "plum",
-  string
-> = {
-  terracotta: "var(--color-accent)",
-  clay: "var(--project-clay)",
-  olive: "var(--project-olive)",
-  slate: "var(--project-slate)",
-  plum: "var(--project-plum)",
+const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string> = {
+  terracotta: 'var(--color-accent)',
+  clay: 'var(--project-clay)',
+  olive: 'var(--project-olive)',
+  slate: 'var(--project-slate)',
+  plum: 'var(--project-plum)',
 };
 ---
 
 <span
   class={`tag tag--${size}`}
-  style={theme ? { "--project-accent": ACCENTS[theme] } : undefined}
+  style={theme ? { '--project-accent': ACCENTS[theme] } : undefined}
 >
   {label}
 </span>
