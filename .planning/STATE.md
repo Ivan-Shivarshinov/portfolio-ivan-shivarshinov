@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-current_phase_name: Визуальная система
+current_phase: 02
+current_phase_name: vizualnaya-sistema
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-08-02T19:42:12.821Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-08-02T21:00:17.214Z"
 last_activity: 2026-08-02
-last_activity_desc: Phase 01 complete, transitioned to Phase 2
+last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 13
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Состояние проекта
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-31)
 
 **Core value:** Портфолио подтверждает позиционирование «веб-разработчик с продуктовым подходом»: центральная интерактивная механика (индекс работ) — осмысленное доказательство компетенции, а не декоративный эффект
-**Current focus:** Phase 01 — osnova-proekta
+**Current focus:** Phase 02 — vizualnaya-sistema
 
 ## Current Position
 
-Phase: 2 — Визуальная система
-Plan: Not started
+Phase: 02 (vizualnaya-sistema) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-08-02 — Phase 01 complete, transitioned to Phase 2
+Last activity: 2026-08-02 — Phase 02 execution started
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100%
 | Phase 01-osnova-proekta P05 | 5 | 2 tasks | 6 files |
 | Phase 01-osnova-proekta P06 | 9h26m | 3 tasks | 3 files |
 | Phase 01-osnova-proekta P01-07 | 11 | 2 tasks | 2 files |
+| Phase 02 P01 | 18 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Progress: [██████████] 100%
 - [Phase ?]: Правка Stacki в src/pages/index.astro (переформатирование) откачена: строка 271 симв. против printWidth 80 prettier — нарушение контракта форматирования проекта (T-01-06)
 - [Phase ?]: 01-07 T1: GitHub-remote создан как public (portfolio-ivan-shivarshinov) по решению 01-01 T3; первый push из main зелёный на GitHub Actions (lint -> check -> build)
 - [Phase ?]: 01-07 T2: CI workflow использует node-version 22 (LTS) + cache npm; engines.node >= 22.22.3 подтверждены зелёным прогоном на Node 22
+- [Phase ?]: 02-01 T1: W1-маршрут вычисляется относительно dist/, а не корня проекта (иначе routeForFile даёт dist/index.html вместо /)
+- [Phase ?]: 02-01 T1: grep-контроль использования компонентов пропускается с предупреждением при отсутствии файлов в src/pages|src/layouts (guard-паттерн как для dist)
+- [Phase ?]: 02-01 T2: check-theme не включён в verify-цепочку — требует собранного ProjectCard и дублирует astro check; реальный прогон в 02-04 Task 2
 
 ### Pending Todos
 
@@ -116,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-02T18:43:09.845Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-vizualnaya-sistema/02-UI-SPEC.md
+Last session: 2026-08-02T21:00:17.199Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
