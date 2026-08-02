@@ -110,4 +110,4 @@
 - Требования Validated только после реализации и проверки (verify-phase)
 
 ---
-*Last updated: 2026-07-31 после создания roadmap (new-project-from-ingest)*
+*Last updated: 2026-08-02 — Phase 1 «Основа проекта» complete: Astro-каркас, tokens, контентные схемы, SEO-база, spike Stacki, CI (фазовые решения и шрифты — в STATE.md Decisions)*
