@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: vizualnaya-sistema
-status: draft
+status: approved
+reviewed_at: 2026-08-02
 shadcn_initialized: false
 preset: none
 created: 2026-08-02
@@ -205,23 +206,32 @@ All copy in Russian (D-06/D-08); Latin caps only inside the mono technical layer
 
 ## UI Considerations
 
-Applicable state considerations resolved: **6 covered, 0 backstop, 0 unresolved** — remainder dismissed with reasons.
-
-Phase 2 surface: Nav (nav), page shell + hero + placeholders (static-content), Media (media), ProjectCard (list-collection — fixtures only), Button/Link/Tag (interactive-control).
+UI-consideration probe (2026-08-02): 9 surfaces — E1 Nav, E2 Media, E3 ProjectCard, E4 Button, E5 Link, E6 Tag, E7 SectionHeading, E8 Footer, E9 page shell + hero + placeholders (element kinds confirmed with user). **30 applicable considerations — 13 covered, 17 dismissed with reasons, 0 backstop, 0 unresolved.**
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
-| empty | media | ✅ covered | Media without an image renders the frame with ratio (R7 AC) |
-| empty | static-content (placeholders) | ✅ covered | Empty-state: mono caption «WORK — раздел в разработке» + 1px frame + «На главную» link (D-04) |
-| long-text | nav | ✅ covered | Mono 14px labels; below bp-md a one-line set of 4 short labels (see Copywriting) |
-| long-text | static-content (hero name) | ✅ covered | Display clamp(28px…) — «Шиваршинов» (11 chars ≈ 231px at 28px) fits 272px column at 320px; wraps naturally otherwise, no truncation |
-| overflow | nav | ✅ covered | Below bp-md: indexes/separators hidden, «Лаборатория»→«Лаб», «Главная» in header — ≈226px total vs 272px available; no horizontal scroll (AC R6) |
-| overflow | media | ✅ covered | Slot content clipped by the frame (overflow hidden, R7 AC) |
-| populated | list-collection | ✅ covered | ProjectCard renders with defaults/fixtures without errors (AC#7); real data arrives in phase 3 |
-| zero-one-many | list-collection | ⛔ dismissed | No data-driven collections rendered in phase 2 (project data — phase 3); fixtures deterministic at build |
-| loading | nav, static-content, media | ⛔ dismissed | Static SSG output; zero client-side loading in phase 2 (no islands, no fetch; AC#5) |
-| error | static-content, media | ⛔ dismissed | No user-facing failure surfaces in phase 2: no forms, no fetch, no client JS |
-| partial | form, list-collection | ⛔ dismissed | No forms and no partially-filled data renders in phase 2 |
+| empty | media (E2) | ✅ covered | Without an image the frame renders with ratio (R7 AC) |
+| empty | list-collection (E3) | ✅ covered | No data-driven collections in phase 2 — Selected Work strip renders a fixed set of fixture cards at build (AC#7); real data arrives phase 3 |
+| populated | media (E2) | ✅ covered | figure with image in the slot: 1px `--color-line` frame, ratio, optional mono caption |
+| populated | list-collection (E3) | ✅ covered | Card renders with fixture data without errors (AC#7) |
+| overflow | nav (E1) | ✅ covered | Below bp-md: indexes/separators hidden, «Лаборатория»→«Лаб», «Главная» in header — ≈226px < 272px; no horizontal scroll (AC R6) |
+| overflow | media (E2) | ✅ covered | Slot content clipped by the frame — overflow hidden (AC R7) |
+| overflow | list-collection (E3) | ✅ covered | Card title wraps naturally, no truncation; media slot clips content |
+| overflow | SectionHeading (E7) | ✅ covered | layout split collapses to stacked (meta above title) below bp-md; title wraps |
+| overflow | page shell + hero + placeholders (E9) | ✅ covered | Hero name ≈231px at 28px < 272px column at 320px; empty-state frame fits the column; no horizontal scroll (AC R10) |
+| long-text | nav (E1) | ✅ covered | One-line 4-label set (14px mono) below bp-md; 5 labels at ≥768px — math in Copywriting Contract |
+| long-text | list-collection (E3) | ✅ covered | Card title (20px Unbounded) wraps naturally, no truncation |
+| long-text | SectionHeading (E7) | ✅ covered | Section title wraps naturally, no truncation |
+| long-text | hero name (E9) | ✅ covered | Display clamp(28px, 5vw, 40px) — «Шиваршинов» (11 chars ≈ 231px at 28px) fits 272px column at 320px; wraps naturally otherwise, no truncation |
+| loading | nav, media, list-collection (E1–E3) | ⛔ dismissed | Static SSG, zero client JS in phase 2 (AC R5) — loading impossible by construction |
+| error | nav, media, list-collection (E1–E3) | ⛔ dismissed | No forms, no fetch, no client JS — no user-facing failure surfaces |
+| partial | list-collection (E3) | ⛔ dismissed | No data-driven collections — partially-filled renders impossible (fixtures deterministic at build) |
+| zero-one-many | list-collection (E3) | ⛔ dismissed | No data-driven collections in phase 2 — 0/1/many not applicable |
+| overflow | Button/Link/Tag (E4–E6) | ⛔ dismissed | Labels are contract-fixed short copy («Смотреть работы», «На главную»), not data-driven |
+| overflow | Footer (E8) | ⛔ dismissed | Footer row is contract-fixed short content (≈200px at 12px mono < 272px at 320px) |
+| long-text | media captions (E2) | ⛔ dismissed | Captions are contract-fixed short mono lines in phase 2 |
+| long-text | Button/Link/Tag (E4–E6) | ⛔ dismissed | Labels are contract-fixed short copy; no user-supplied strings |
+| long-text | Footer (E8) | ⛔ dismissed | Footer row is contract-fixed short text |
 
 ---
 
@@ -238,11 +248,11 @@ Safety Gate: `not applicable — component library absent; ADR mandates plain CS
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** {pending / approved YYYY-MM-DD}
+**Approval:** approved 2026-08-02
