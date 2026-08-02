@@ -10,7 +10,8 @@
   --color-destructive: #B3261E;
 
   /* typography */
-  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-display: 'Unbounded', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --text-body: 16px;
   --text-label: 14px;
