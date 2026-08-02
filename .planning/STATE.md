@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: vizualnaya-sistema
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-08-02T21:10:20.109Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-08-02T21:24:01.335Z"
 last_activity: 2026-08-02
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 13
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 02 (vizualnaya-sistema) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-08-02 — Phase 02 execution started
 
-Progress: [███████░░░] 69%
+Progress: [████████░░] 77%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [███████░░░] 69%
 | Phase 01-osnova-proekta P01-07 | 11 | 2 tasks | 2 files |
 | Phase 02 P01 | 18 | 2 tasks | 4 files |
 | Phase 02 P02 | 10 | 2 tasks | 1 files |
+| Phase 02-vizualnaya-sistema P03 | 14 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,10 @@ Progress: [███████░░░] 69%
 - [Phase ?]: 02-01 T2: check-theme не включён в verify-цепочку — требует собранного ProjectCard и дублирует astro check; реальный прогон в 02-04 Task 2
 - [Phase ?]: 02-02: Принята палитра проектов (вариант palette-research, D-07/D-08): clay #8A5A44, olive #6B6B3F, slate #55606E, plum #6E4A5C; терракота #A84B32 — системный accent (locked, не переопределяется); enum-имена terracotta/clay/olive/slate/plum не пересматриваются (costly-контракт D-07, схема projects фазы 3). Потребитель: 02-03 Task 1 — значения --project-* в tokens.css; контраст ≥ 4.5:1 на bg/surface проверяется check-contrast (02-03).
 - [Phase ?]: 02-02: Первый экран (index.astro) — дефолт D-12 «контрактная типографика» (вариант hero-default; Figma MCP в сессии планирования недоступен — RESEARCH A2, пользователь не передал ссылки/скриншоты): моно-метка «01 / HOME» + имя (Unbounded display) + primary CTA Button «Смотреть работы» (D-13-минимум). Фиксируется в docs/hero-concept.md (02-05 Task 2) с обоснованием по критериям D-14; задел под фазу 3 без перекомпоновки (D-12). Потребитель: 02-05 Task 2 (docs/hero-concept.md), 02-03 Task 1 (рендер дефолта на главной).
+- [Phase ?]: 02-03 T1: Nav рендерит имя-ссылку и меню (D-02): на <768px имя и навигация — колонкой, на ≥768px — одна строка space-between; гарантирует отсутствие горизонтального скролла на 320px (UI-SPEC overflow nav)
+- [Phase ?]: 02-03 T1: check-tokens VAR_DEF_RE дополнен lookbehind (?<![\w.-]) — исключение BEM-модификаторов .class--mod: из правила «единый файл токенов» (Rule 1, ложные срабатывания на .button--primary:hover)
+- [Phase ?]: 02-03 T1: sectionLabel Footer выводится из pageLabel (split(' ').at(-1)) — единый источник Latin-метки раздела без дублирования
+- [Phase ?]: 02-03 T1: Footer держит собственный контейнер (max-width + gutter-токены + media 768px) — компонент сам отвечает за свою сетку (ADR §5.4)
 
 ### Pending Todos
 
@@ -123,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-02T21:10:20.093Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-08-02T21:24:01.320Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
