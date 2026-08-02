@@ -1,0 +1,102 @@
+---
+// ProjectCard.astro — карточка проекта (R5): theme-контракт --project-accent
+// через inline style на корне article (Pattern 2); custom property наследуется
+// в слоты — Media/Tag внутри карточки получают accent без дополнительных
+// правил (Pitfall 6, runtime-каскад). Нейтральный покой (SC3, D-08): в покое
+// ink/line — ноль акцента; accent появляется только в hover (title).
+// Слоты: именованный 'media' (для Media.astro) и дефолтный (Tag и прочее).
+interface Props {
+  title: string;
+  meta?: string;
+  theme?: 'terracotta' | 'clay' | 'olive' | 'slate' | 'plum';
+  showMetrics?: boolean;
+  layout?: 'stacked' | 'split';
+}
+
+const { title, meta, theme, showMetrics = false, layout = 'stacked' } = Astro.props;
+const isSplit = layout === 'split';
+
+const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string> = {
+  'terracotta': 'var(--color-accent)',
+  'clay': 'var(--project-clay)',
+  'olive': 'var(--project-olive)',
+  'slate': 'var(--project-slate)',
+  'plum': 'var(--project-plum)',
+};
+---
+
+<article
+  class={`card${isSplit ? ' card--split' : ''}`}
+  style={theme ? { '--project-accent': ACCENTS[theme] } : undefined}
+>
+  <div class="card__media">
+    <slot name="media" />
+  </div>
+  <div class="card__body">
+    <h3 class="card__title">{title}</h3>
+    {showMetrics && meta && <p class="card__meta">{meta}</p>}
+    <div class="card__footer">
+      <slot />
+    </div>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    transition: border-color var(--motion-base) var(--ease-standard);
+  }
+  .card:hover {
+    border-color: var(--color-ink-muted);
+  }
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  /* Title переносится без обрезания (overflow-wrap, UI-SPEC long-text) */
+  .card__title {
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: break-word;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+  /* accent — только в hover: нейтральный покой (SC3, D-08) */
+  .card:hover .card__title {
+    color: var(--project-accent, var(--color-ink));
+  }
+  .card__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+  .card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+  /* split: базовое состояние — stacked; ≥768px — media и текстовая часть рядом */
+  .card--split {
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .card--split {
+      flex-direction: row;
+    }
+    .card--split .card__media {
+      flex: 1;
+    }
+    .card--split .card__body {
+      flex: 1;
+    }
+  }
+</style>
