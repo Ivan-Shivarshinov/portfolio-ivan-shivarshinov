@@ -1,0 +1,29 @@
+---
+// IconLinkedin.astro — LinkedIn (D-09/D-10/D-11): прямоугольник-рамка
+// + три горизонтальных отрезка внутри (стилизованные «строки»)
+// + квадрат-точка. Сетка 24 единиц viewBox, stroke 2, currentColor, aria-hidden.
+interface Props {
+  size?: number;
+}
+
+const { size = 24 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+>
+  <rect x="4" y="4" width="16" height="16" />
+  <rect x="7" y="7" width="4" height="4" />
+  <path d="M7 12h11" />
+  <path d="M7 15h11" />
+  <path d="M7 18h11" />
+</svg>

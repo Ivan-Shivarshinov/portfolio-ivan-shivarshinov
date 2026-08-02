@@ -1,0 +1,26 @@
+---
+// IconCopy.astro — копировать (D-09/D-10/D-11): два прямоугольника —
+// оригинал и копия со сдвигом. Сетка 24 единиц viewBox, stroke 2,
+// currentColor, aria-hidden.
+interface Props {
+  size?: number;
+}
+
+const { size = 24 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+>
+  <rect x="10" y="10" width="10" height="10" />
+  <rect x="4" y="4" width="10" height="10" />
+</svg>

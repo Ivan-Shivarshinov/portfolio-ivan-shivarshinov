@@ -1,0 +1,26 @@
+---
+// IconMail.astro — письмо (D-09/D-10/D-11): прямоугольник-конверт (рамка)
+// + V-образная ломаная-клапан из нижних углов к верхнему центру.
+// Сетка 24 единиц viewBox, stroke 2, currentColor, aria-hidden.
+interface Props {
+  size?: number;
+}
+
+const { size = 24 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+>
+  <rect x="4" y="7" width="16" height="10" />
+  <path d="M4 17l8-6 8 6" />
+</svg>

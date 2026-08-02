@@ -1,0 +1,26 @@
+---
+// IconArrowDown.astro — стрелка вниз (D-09/D-10/D-11): вертикальный отрезок
+// сверху вниз + стрелка с квадратным углом внизу (зеркально IconArrowRight).
+// Сетка 24 единиц viewBox, stroke 2, currentColor, aria-hidden.
+interface Props {
+  size?: number;
+}
+
+const { size = 24 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+>
+  <path d="M12 4v12" />
+  <path d="M5 13l7 7 7-7" />
+</svg>
