@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Базовые layouts и общий SEO-компонент работают: каждая страница получает title, description, canonical, Open Graph; sitemap генерируется.
   5. Существует документ о покрытии конструкций Astro в Stacki (итог spike: открытие проекта, чтение компонентов и props, variants, scoped styles, CSS variables, JSON-коллекции, frontmatter, View Transitions) — зафиксирован в Git до визуальной сборки.
 
-**Plans**: 5/7 plans executed
+**Plans**: 6/7 plans executed
 
 Plans:
 **Wave 1**
@@ -54,7 +54,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-06-PLAN.md — Spike Stacki: временная страница View Transitions, живой прогон, docs/stacki-coverage.md
+- [x] 01-06-PLAN.md — Spike Stacki: временная страница View Transitions, живой прогон, docs/stacki-coverage.md
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -145,7 +145,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Основа проекта | 5/7 | In Progress|  |
+| 1. Основа проекта | 6/7 | In Progress|  |
 | 2. Визуальная система | TBD | Not started | - |
 | 3. Контент и страницы | TBD | Not started | - |
 | 4. Прототип индекса работ | TBD | Not started | - |
