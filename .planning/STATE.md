@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: kontent-i-stranicy
 status: executing
-stopped_at: "Completed 03-04-PLAN.md (контакты: contacts.json, /contact с копированием email, футер)"
-last_updated: "2026-08-03T19:17:32.210Z"
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-08-03T21:41:50.332Z"
 last_activity: 2026-08-03
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 19
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 03 (kontent-i-stranicy) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-08-03 — Phase 03 execution started
 
-Progress: [█████████░] 89%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Progress: [█████████░] 89%
 | Phase 03-kontent-i-stranicy P02 | 9 | 3 tasks | 4 files |
 | Phase 03 P03 | 25 | 3 tasks | 7 files |
 | Phase 03-kontent-i-stranicy P04 | 15 | 2 tasks | 3 files |
+| Phase 03-kontent-i-stranicy P05 | 6min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,9 @@ Progress: [█████████░] 89%
 - [Phase ?]: Правка пользователя в кейс skala (03-03 Task 3): в «Результат» добавлена метрика роста команд ~100 → 600+ (публичная цифра skala.io «600+ команд», узкая — платформа, не сайт)
 - [Phase ?]: Галерея кейсов (2–4 скриншота на кейс) отложена: gap-план после верификации фазы (03-03 checkpoint, deferred-items.md) — затрагивает content.config.ts, страницу кейса, check-collections
 - [Phase ?]: Значения контактов утверждены пользователем 2026-08-03 (D-12): email ivan.shivarshinov@gmail.com, telegram @ivan_shivarshinov, github https://github.com/Ivan-Shivarshinov (новый URL — подтверждён пользователем); правок формулировок нет — по умолчанию UI-SPEC Copywriting Contract
+- [Phase ?]: Тексты /about и /lab утверждены пользователем 2026-08-03 (D-04, чекпоинт Task 2, ответ «Тексты утверждены») — коммит без правок формулировок
+- [Phase ?]: Формула обещания на / — дословно REQ-main-promise (D-13): Lead → моно → Body → категория → подпись; CTA «Смотреть работы» — последний элемент hero (Q5)
+- [Phase ?]: checkLinkHoverLogic: ok = смена цвета ссылки (underline — контракт Link-компонента, не футер-ссылок); Шаг 5 проверяет state machine копирования, а не успех clipboard
 
 ### Pending Todos
 
@@ -157,6 +161,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T19:17:32.188Z
-Stopped at: Completed 03-04-PLAN.md (контакты: contacts.json, /contact с копированием email, футер)
+Last session: 2026-08-03T21:41:50.310Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None
