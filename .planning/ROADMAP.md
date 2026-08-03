@@ -14,7 +14,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Основа проекта** - Astro-каркас, tokens, схемы данных, layouts, SEO и spike-проверка Stacki (completed 2026-08-02)
-- [ ] **Phase 2: Визуальная система** - типографика, цвет, сетка, переиспользуемые компоненты, motion-токены
+- [x] **Phase 2: Визуальная система** - типографика, цвет, сетка, переиспользуемые компоненты, motion-токены (completed 2026-08-03)
 - [ ] **Phase 3: Контент и страницы** - Home, Work, Case Study, Lab, About, Contact с реальным контентом
 - [ ] **Phase 4: Прототип индекса работ** - изолированный Three.js-прототип центральной механики и вердикт
 - [ ] **Phase 5: Интеграция индекса и motion** - сцена в Astro island, реальные данные Work, переход «список → кейс»
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
-| 2. Визуальная система | 6/6 | In Progress|  |
+| 2. Визуальная система | 6/6 | Complete    | 2026-08-03 |
 | 3. Контент и страницы | TBD | Not started | - |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |

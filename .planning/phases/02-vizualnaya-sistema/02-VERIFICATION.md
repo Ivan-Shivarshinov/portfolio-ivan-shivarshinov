@@ -1,16 +1,83 @@
 ---
 phase: 02-vizualnaya-sistema
-verified: 2026-08-03T08:40:00Z
-status: complete
+verified: 2026-08-03T13:00:00Z
+status: passed
+score: 5/5 must-haves verified
+behavior_unverified: 0
+overrides_applied: 0
 gate: plan-02-06
 note: "Финальный гейт закрыт: Task 1 (автоматический слой) зелёный, Task 2 (визуальный проход пользователя) пройден с циклом дефект→фикс→повторное одобрение — дефект интерполяции {expr} в кавычках атрибутов исправлен (494fa83) и прикрыт регрессионным правилом (f91d4db), пользователь одобрил после фиксов"
+goal_verification: "Фазовая верификация (goal-backward, 2026-08-03): 4/4 Success Criteria ROADMAP + REQ-design-implications подтверждены кодом и живыми прогонами (npm run verify exit 0; verify-preview 5 маршрутов 200 + text/html; self-tests 3 скриптов exit 0; CI green на main по gh run list); claims существующего 02-VERIFICATION.md (Task 1/2) сверены с codebase — все подтверждены, включая фикс D-1 в dist. Вердикт: PASSED — цель фазы достигнута."
 ---
 
-# Phase 02: Визуальная система — Verification Report (финальный гейт)
+# Phase 02: Визуальная система — Verification Report
 
-**Phase Goal:** Единая визуальная система «Calm Interface, Active Work» реализована в коде: токены расширены, все 5 страниц используют оболочку системы, компоненты с семантическими пропами, интерактивные состояния только CSS, контракт проектных цветов, адаптивность, медиа-оболочка, скрипты верификации.
+**Phase Goal (ROADMAP):** Единая визуальная система «Calm Interface, Active Work»: нейтральная основа, сильная типографика, строгая модульная сетка, переиспользуемые UI-компоненты с семантическими props и motion-токены; адаптивность живёт внутри компонентов.
 **Verified:** 2026-08-03
-**Status:** complete — автоматический слой зелёный (Task 1) + визуальный проход пользователя пройден (Task 2): 1 дефект найден, исправлен и повторно одобрен пользователем.
+**Status:** passed — автоматический слой зелёный (Task 1, перепрогон подтверждён) + визуальный проход пользователя пройден (Task 2, approved) + фазовая верификация цели (goal-backward) — 5/5 без замечаний.
+
+---
+
+## Фазовая верификация цели (goal-backward, добавлено при фазовой проверке)
+
+Метод: цель фазы из ROADMAP.md → observable truths → проверка в codebase (артефакты, wiring, поведение). Claims существующего отчёта (ниже) сверены с кодом и перепрогоном команд — не по SUMMARY.
+
+### Достижение цели: observable truths
+
+| # | Truth (Success Criterion / Requirement) | Статус | Доказательство |
+|---|------------------------------------------|--------|----------------|
+| 1 | SC1: Все страницы используют общую систему типографики, цвета и сетки через tokens — без случайных one-off значений | ✓ VERIFIED | Единственный `src/styles/tokens.css` (6+ групп, bp-группа `--bp-md: 768px`, `--bp-lg: 1200px`); check-tokens правила 1–4 (единый файл, группы, запрет hex/px вне tokens) зелёные в полном прогоне; компоненты используют только `var(--*)`; литералы — только разрешённые 1px/2px (border/outline) |
+| 2 | SC2: Базовые UI-компоненты (кнопки, ссылки, заголовки секций, карточки проектов, медиа, навигация, footer) переиспользуются и принимают семантические props (layout, density, theme, showMetrics), а не сырые значения отступов | ✓ VERIFIED | Button `variant|density`, Link `variant`, SectionHeading `meta|title|layout`, ProjectCard `theme|showMetrics|layout`, Tag `theme|size`, Media `ratio|caption`, Nav/Footer в BaseLayout; grep-контроль использования 8 компонентов зелёный (все импортированы в pages/layouts); отступы только `var(--space-*)` (px-правило check-tokens) |
+| 3 | SC3: В спокойном состоянии интерфейс нейтрален и профессионален; акценты, цвета проектов и движение проявляются только во взаимодействии | ✓ VERIFIED | Код: accent только в `:hover`/`:focus-visible`/`aria-current` (Nav, Link, Button-secondary, ProjectCard title); нейтральный покой подтверждён визуальным проходом пользователя (Task 2, approved): без взаимодействия ноль декоративных заливок; декоративных медиа нет — `public/` содержит только шрифты + robots.txt |
+| 4 | SC4: Компоненты адаптивны: сетка складывается, отступы масштабируются, изображения обрабатываются — на mobile без дублирования стилей и без потери содержания | ✓ VERIFIED | Media-запросы только `min-width: 768px` (число = `--bp-md`, сверка check-tokens зелёная) и только внутри компонентов (Nav, Footer, SectionHeading, ProjectCard, grid work.astro); gutter `--gutter-mobile`→`--gutter-desktop`; Media: aspect-ratio + overflow hidden + min-height 0; визуальный проход 320/375/768/1200/1920 approved (без скролла, без потери контента) |
+| 5 | REQ-design-implications: дизайн поддерживает образ системно мыслящего разработчика (системность видна, содержание важнее декора, без клише «фрилансер-портфолио» и AI-эстетики) | ✓ VERIFIED | Системность: моно-слой «номера и подписи» (индексы 01–05, метки страниц «01 / HOME»…«05 / CONTACT»), модульная сетка, tokens; содержание важнее декора: честные empty-state («раздел в разработке»), нейтральный покой; запреты 02-05/02-06 (декоративные медиа не главный язык, макет не источник правды) — resolved, подтверждены кодом (0 изображений в репо) и docs/hero-concept.md (D-15); запас под фазу 3: SYSTEM DEMO с маркером `// fixture: replaced in phase 3`, контракт Media-слота для `<Image />` |
+
+**Score:** 5/5 truths verified (0 present, behavior-unverified; 0 overrides)
+
+### Behavioral spot-checks (перепрогон проверяющего)
+
+| Поведение | Команда | Результат | Статус |
+| --------- | ------- | --------- | ------ |
+| Полная verify-цепочка (build + astro check + check-seo + check-tokens + check-contrast + check-collections + check-prohibitions) | `npm run verify` | exit 0; check-tokens OK (10 правил: bp/медиа-сверка, transition-grep, интерполяция атрибутов, W1, использование, 0 `<script>`); check-contrast 20/20 пар ≥ 4.5:1; check-collections 3 негативных теста упали ожидаемо | ✓ PASS |
+| 5 маршрутов preview HTTP 200 + text/html | `MSYS_NO_PATHCONV=1 node scripts/verify-preview.mjs --routes /,/work,/lab,/about,/contact` | OK: все 5 маршрутов 200 + text/html, exit 0 (первый заход без MSYS_NO_PATHCONV дал ложный FAIL по `/` из-за path-mangling Git Bash — артефакт шелла, не кода) | ✓ PASS |
+| Self-tests валидационных скриптов | `node scripts/check-tokens.mjs --self-test` и аналогично check-contrast / check-theme | exit 0 × 3; эталоны WCAG 21:1 / 5.40:1 / 1.35:1 сходятся | ✓ PASS |
+| CI зелёный на main | `gh run list --limit 5` | 5 последних runs — success, включая финальные push фазы 2 (198ad68, 985ec12) | ✓ PASS |
+| W1 по dist | `grep -o 'aria-current="page"' dist/*/index.html` | ровно 1 на каждую из 5 страниц, href соответствует маршруту | ✓ PASS |
+| Фикс D-1 в собранном HTML | `grep -o 'class="button button--[a-z]* button--[a-z]*"' dist/index.html` | `class="button button--primary button--lg"` и `class="link link--default"` — шаблонные литералы рендерятся корректно; литеральные `{` в dist только внутри scoped CSS (`<style>`), не в атрибутах | ✓ PASS |
+| SEO-контракт по dist | check-seo (в verify) + спот-проверка | 5 уникальных пар title/description, canonical + OG на страницах, sitemap-index.xml → sitemap-0.xml с 5 url | ✓ PASS |
+
+### Сверка claims существующего 02-VERIFICATION.md с codebase
+
+| Claim (Task 1) | Сверка | Итог |
+| --------------- | ------ | ---- |
+| `npm run verify` exit 0 | Перепрогон проверяющего — exit 0 | ✓ подтверждено |
+| 5 маршрутов 200 + text/html | Перепрогон — OK | ✓ подтверждено |
+| W1: ровно один `aria-current="page"` на страницу | dist: 1 на каждой из 5 страниц | ✓ подтверждено |
+| Контраст 20 пар ≥ 4.5:1 | Перепрогон: все 20 OK (15.93:1 … 7.51:1) | ✓ подтверждено |
+| 0 тегов `<script>` в dist | grep по dist: 0 файлов | ✓ подтверждено |
+| SEO: 5 уникальных пар, canonical + OG, sitemap 5 url | dist: пары уникальны, canonical/OG есть, sitemap-0.xml — 5 url | ✓ подтверждено |
+| Моно-метки «01 / HOME»…«05 / CONTACT» на 5 страницах | dist: метки на всех страницах | ✓ подтверждено |
+| Главная рендерит hero-default D-12 | index.astro + docs/hero-concept.md (вердикт D-12, секции Выбор/Варианты/Обоснование/Статус макета) | ✓ подтверждено |
+| Д-1 исправлен (494fa83) + регрессионное правило 10 (f91d4db) | Код: шаблонные литералы в Button/Link.astro; check-tokens правило 10 с self-test фикстурами bad-attr/ok-attr; dist без литеральных `{` в атрибутах | ✓ подтверждено |
+| Task 2 (визуальный проход) пройден и одобрен | Документирован в отчёте: 320/375/768/1200/1920, reduced-motion, нейтральный покой, цикл дефект→фикс→re-approval; код соответствует описанному финальному состоянию | ✓ подтверждено (не перепрогонялся — по инструкции, проход уже approved) |
+
+### Requirements coverage
+
+| Requirement | Source | Description | Статус | Evidence |
+| ----------- | ------ | ----------- | ------ | -------- |
+| REQ-design-implications | ROADMAP Phase 2 + PLAN 02-01…02-06 | Дизайн поддерживает образ системно мыслящего разработчика; содержание важнее декора; без клише | ✓ SATISFIED | Truth 5 выше; tokens-система, моно-слой, честные empty-state, 0 декоративных медиа; docs/hero-concept.md |
+
+Орфанных требований фазы 2 нет: единственный ID фазы (REQ-design-implications) покрыт всеми 6 планами (`requirements:` frontmatter) и реализован.
+
+### Anti-patterns
+
+Скан `src/`, `scripts/check-tokens.mjs`, `scripts/check-contrast.mjs`, `scripts/check-theme.mjs` на TBD/FIXME/XXX/TODO/HACK/PLACEHOLDER/«coming soon»/`return null`/hardcoded-empty props: **0 совпадений**. Отложенный пункт (CI Node 20 deprecation annotation) зафиксирован в `deferred-items.md` → Phase 6, не является gap фазы 2.
+
+### Gaps
+
+Gaps: **0**. Все 4 Success Criteria ROADMAP и REQ-design-implications подтверждены кодом и живыми прогонами. Человеческая верификация фазы уже выполнена (Task 2, approved) — новых human-пунктов нет.
+
+---
 
 ## Проверки автоматического слоя (Task 1)
 
@@ -79,4 +146,4 @@ note: "Финальный гейт закрыт: Task 1 (автоматичес�
 ---
 
 _Вход для /gsd-verify-work: протокол финального гейта фазы 2._
-_Verified: 2026-08-02 (Task 1) — автоматический слой; 2026-08-03 (Task 2) — визуальный проход пользователя, approved_
+_Verified: 2026-08-02 (Task 1) — автоматический слой; 2026-08-03 (Task 2) — визуальный проход пользователя, approved; 2026-08-03 (фазовая goal-backward верификация) — passed, 5/5._
