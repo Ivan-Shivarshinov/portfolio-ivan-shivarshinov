@@ -129,20 +129,32 @@ const projects = defineCollection({
     pattern: '**/*.{md,mdx}',
     generateId: strictProjectId(),
   }),
-  schema: z.object({
-    slug: z.string(),
-    title: z.string(),
-    summary: z.string(),
-    role: z.string(),
-    stack: z.array(z.string()),
-    year: z.number().int(),
-    status: z.enum(['active', 'archived']),
-    'client-type': z.string(),
-    // Детерминированная сортировка при равных датах (D-09)
-    order: z.number().int().default(0),
-    // Задел на EN (D-08): поля локали необязательны
-    titleEn: z.string().optional(),
-  }),
+  // schema-хелпер image() (R8): cover валидируется как файл при сборке,
+  // путь резолвится относительно папки записи (Pattern 1, 03-RESEARCH.md).
+  schema: ({ image }) =>
+    z.object({
+      slug: z.string().regex(/^[a-z0-9-]+$/, 'slug: только латиница, цифры и дефисы (URL-сегмент)'),
+      title: z.string(),
+      summary: z.string(),
+      role: z.string(),
+      stack: z.array(z.string()),
+      year: z.number().int(),
+      status: z.enum(['active', 'archived']),
+      'client-type': z.string(),
+      // Детерминированная сортировка при равных датах (D-09)
+      order: z.number().int().default(0),
+      // Задел на EN (D-08): поля локали необязательны
+      titleEn: z.string().optional(),
+      // D-05: тема кейса — свойство записи, рендерится в карточке Work,
+      // карточке Home и на странице кейса; D-06: терракота кейсам не назначается
+      theme: z.enum(['terracotta', 'clay', 'olive', 'slate', 'plum']),
+      // D-08: флаг отбора секции «Избранные работы» на главной
+      featured: z.boolean().default(false),
+      // R8 (D-02): скриншот кейса, файл существует относительно папки записи
+      cover: image(),
+      // Alt для Image (обязателен — astro:assets)
+      coverAlt: z.string(),
+    }),
 });
 
 const notes = defineCollection({
@@ -171,4 +183,12 @@ const tools = defineCollection({
   schema: z.object({ id: z.string(), title: z.string(), description: z.string() }),
 });
 
-export const collections = { projects, notes, services, skills, tools };
+const contacts = defineCollection({
+  // Контакты из src/data (D-11); строгий лоадер: дубликат id — ошибка сборки.
+  // src/data/contacts.json создаётся в плане 03-04 — до этого лоадер логирует
+  // ошибку и продолжает сборку (пустая коллекция).
+  loader: strictJsonLoader('./src/data/contacts.json'),
+  schema: z.object({ id: z.string(), label: z.string(), value: z.string(), href: z.string() }),
+});
+
+export const collections = { projects, notes, services, skills, tools, contacts };
