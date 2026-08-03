@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-// scripts/check-visual.mjs — визуальный смоук фазы 2 (слой поверх живого прохода, не замена):
+// scripts/check-visual.mjs — визуальный смоук (слой поверх живого прохода, не замена):
 // механические проверки, которые человек всё равно делает глазами: отсутствие
-// горизонтального скролла на ключевых ширинах, hover-отклики CTA и ссылок,
-// prefers-reduced-motion (мгновенные переходы). Оценка композиции/ритма — за человеком.
+// горизонтального скролла на ключевых ширинах (фиксированные маршруты + маршрут
+// первого кейса из коллекции projects), hover-отклики CTA и футер-ссылок,
+// prefers-reduced-motion (мгновенные переходы), state machine кнопки копирования
+// на /contact. Оценка композиции/ритма — за человеком.
 //
 // CLI:
 //   node scripts/check-visual.mjs                    — полный прогон (порт 4321)
@@ -15,8 +17,9 @@
 // Preview-процесс и браузер всегда завершаются в finally.
 
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const DEFAULT_ROUTES = ['/', '/work', '/lab', '/about', '/contact'];
@@ -152,32 +155,64 @@ async function checkCtaHover(page) {
   return { ok: before !== after, detail: `${before} -> ${after}` };
 }
 
-/** Шаг 3: hover текстовой ссылки — подчёркивание + accent. */
+/** Шаг 3: hover футер-ссылки контакта — цвет меняется (ink-muted → ink). */
 async function checkLinkHover(page) {
-  const link = page.getByRole('link', { name: 'На главную' });
-  const before = await link.evaluate((el) => ({
-    deco: getComputedStyle(el).textDecorationLine,
-    color: getComputedStyle(el).color,
-  }));
+  const link = page.getByRole('link', { name: /github/i });
+  const before = await link.evaluate((el) => getComputedStyle(el).color);
   await link.hover();
   await sleep(250);
-  const after = await link.evaluate((el) => ({
-    deco: getComputedStyle(el).textDecorationLine,
-    color: getComputedStyle(el).color,
-  }));
-  const ok = after.deco.includes('underline') && after.color !== before.color;
-  return { ok, detail: `${before.deco}/${before.color} -> ${after.deco}/${after.color}` };
+  const after = await link.evaluate((el) => getComputedStyle(el).color);
+  return { ok: before !== after, detail: `${before} -> ${after}` };
 }
 
 /** Шаг 4: prefers-reduced-motion — длительности переходов 0s. */
 async function checkReducedMotion(page) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  const link = page.getByRole('link', { name: 'На главную' });
+  const link = page.getByRole('link', { name: /github/i });
   await link.hover();
   await sleep(50);
   const transition = await link.evaluate((el) => getComputedStyle(el).transitionDuration);
   const ok = /^0s(,0s)*$/.test(transition.trim());
   return { ok, detail: `transition-duration ${transition}` };
+}
+
+/**
+ * Маршрут первого кейса для скролл-проверки: запись коллекции projects с
+ * минимальным order (единая сортировка, Pitfall 10). Парсится только frontmatter
+ * (между --- строками); dot-файлы и файлы без order/slug пропускаются.
+ * @param {string} projectsDir абсолютный путь к src/content/projects
+ * @returns {string|null} `/work/{slug}/` или null — записей нет (skip, совместимость с фазой 2)
+ */
+function getFirstCaseRoute(projectsDir) {
+  let entries;
+  try {
+    entries = readdirSync(projectsDir);
+  } catch {
+    return null;
+  }
+  let best = null;
+  for (const name of entries) {
+    if (name.startsWith('.') || !/\.mdx?$/i.test(name)) continue;
+    const fm = readFileSync(join(projectsDir, name), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!fm) continue;
+    const order = fm[1].match(/^\s*order\s*:\s*(-?\d+)\s*$/m);
+    const slug = fm[1].match(/^\s*slug\s*:\s*['"]([^'"]+)['"]\s*$/m);
+    if (!order || !slug) continue;
+    const n = Number(order[1]);
+    if (best === null || n < best.order) best = { order: n, slug: slug[1] };
+  }
+  return best ? `/work/${best.slug}/` : null;
+}
+
+/** Шаг 5: копирование email на /contact — state machine кнопки срабатывает. */
+async function checkCopyEmail(page) {
+  const btn = page.getByRole('button', { name: /Копировать/i });
+  const before = ((await page.locator('#copy-status').textContent()) ?? '').trim();
+  await btn.click();
+  await sleep(250);
+  const after = ((await page.locator('#copy-status').textContent()) ?? '').trim();
+  const ok = before !== after && before === 'Копировать';
+  return { ok, detail: `«${before}» -> «${after}»` };
 }
 
 // ---------------------------------------------------------------------------
@@ -212,11 +247,31 @@ function selfTest() {
   assert('self-test: ширины в порядке', WIDTHS.every((w) => Number.isInteger(w) && w > 0));
   const f = (deco, color) => ({ deco, color });
   assert(
-    'self-test: hover подчёркивает ссылку',
-    checkLinkHoverLogic(f('none', 'rgb(31, 30, 28)'), f('underline', 'rgb(168, 75, 50)')),
+    'self-test: hover меняет цвет ссылки (underline не требуется)',
+    checkLinkHoverLogic(f('none', 'rgb(31, 30, 28)'), f('none', 'rgb(26, 26, 26)')),
+  );
+  assert(
+    'self-test: hover без смены цвета — FAIL',
+    !checkLinkHoverLogic(f('underline', 'rgb(31, 30, 28)'), f('underline', 'rgb(31, 30, 28)')),
   );
   assert('self-test: transition 0s распознаётся', /^0s(,0s)*$/.test('0s'));
   assert('self-test: transition 0.15s НЕ 0s', !/^0s(,0s)*$/.test('0.15s'));
+  // маршрут первого кейса: пустой каталог → skip; минимальный order → маршрут
+  const tmp = mkdtempSync(join(tmpdir(), 'check-visual-'));
+  try {
+    assert(
+      'self-test: пустой projects → skip (null)',
+      getFirstCaseRoute(join(tmp, 'empty')) === null,
+    );
+    const two = join(tmp, 'two');
+    mkdirSync(two, { recursive: true });
+    writeFileSync(join(two, 'zz-b.mdx'), "---\nslug: 'zz-b'\norder: 2\n---\n");
+    writeFileSync(join(two, 'zz-a.mdx'), "---\nslug: 'zz-a'\norder: 1\n---\n");
+    writeFileSync(join(two, '.gitkeep'), '');
+    assert('self-test: минимальный order → /work/zz-a/', getFirstCaseRoute(two) === '/work/zz-a/');
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
   if (failures > 0) {
     console.error(`\nFAIL: self-test — ${failures} провал(ов)`);
     process.exit(1);
@@ -224,9 +279,10 @@ function selfTest() {
   console.log('\nOK self-test');
 }
 
-/** Логика hover-ссылки вынесена для self-test (без браузера). */
+/** Логика hover футер-ссылки вынесена для self-test (без браузера):
+ *  меняется цвет (ink-muted → ink); underline — контракт Link-компонента, не футера. */
 function checkLinkHoverLogic(before, after) {
-  return after.deco.includes('underline') && after.color !== before.color;
+  return after.color !== before.color;
 }
 
 async function main() {
@@ -261,6 +317,21 @@ async function main() {
           console.log(`  ${tag} ${route} @${width}px (${r.detail})`);
         }
       }
+      // маршрут первого кейса (минимальный order из src/content/projects);
+      // пустая коллекция — предупреждение и пропуск (совместимость с фазой 2)
+      const caseRoute = getFirstCaseRoute(join(ROOT, 'src/content/projects'));
+      if (caseRoute) {
+        for (const width of [320, 1200]) {
+          await page.setViewportSize({ width, height: 800 });
+          await page.goto(`${base}${caseRoute}`, { waitUntil: 'networkidle' });
+          const r = await checkNoHScroll(page, caseRoute, width);
+          const tag = r.ok ? 'PASS' : 'FAIL';
+          if (!r.ok) failures++;
+          console.log(`  ${tag} ${caseRoute} @${width}px (${r.detail})`);
+        }
+      } else {
+        console.log('  SKIP кейс-маршрут — коллекция projects пуста (совместимость с фазой 2)');
+      }
 
       // Шаг 2: hover CTA
       console.log('Шаг 2: hover CTA меняет фон');
@@ -271,8 +342,8 @@ async function main() {
       if (!cta.ok) failures++;
       console.log(`  ${ctaTag} CTA hover (${cta.detail})`);
 
-      // Шаг 3: hover текстовой ссылки (страница с «На главную»)
-      console.log('Шаг 3: hover ссылки — подчёркивание + accent');
+      // Шаг 3: hover футер-ссылки контакта (страница с футером — /lab)
+      console.log('Шаг 3: hover футер-ссылки — цвет меняется');
       await page.goto(`${base}/lab`, { waitUntil: 'networkidle' });
       const link = await checkLinkHover(page);
       const linkTag = link.ok ? 'PASS' : 'FAIL';
@@ -286,6 +357,16 @@ async function main() {
       const rmTag = rm.ok ? 'PASS' : 'FAIL';
       if (!rm.ok) failures++;
       console.log(`  ${rmTag} reduced-motion (${rm.detail})`);
+
+      // Шаг 5: копирование email на /contact — статус «Копировать» меняется
+      // (в headless clipboard может быть недоступен — важен факт срабатывания state machine)
+      console.log('Шаг 5: копирование email — статус меняется');
+      await page.setViewportSize({ width: 1200, height: 800 });
+      await page.goto(`${base}/contact`, { waitUntil: 'networkidle' });
+      const copy = await checkCopyEmail(page);
+      const copyTag = copy.ok ? 'PASS' : 'FAIL';
+      if (!copy.ok) failures++;
+      console.log(`  ${copyTag} copy email (${copy.detail})`);
 
       await browser.close();
     } finally {
@@ -305,7 +386,7 @@ async function main() {
     console.error(`\nFAIL: ${failures} визуальн(ый/ых) проверк(а/и) не прошли — см. лог. Сервер: ${stderrRef()}`);
     process.exit(1);
   }
-  console.log('\nOK: визуальный смоук пройден — скролла нет, hover-отклики и reduced-motion в норме');
+  console.log('\nOK: визуальный смоук пройден — скролла нет, hover-отклики, reduced-motion и копирование в норме');
 }
 
 main().catch((err) => {

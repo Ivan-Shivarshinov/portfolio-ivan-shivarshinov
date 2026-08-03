@@ -1,32 +1,78 @@
 ---
-// index.astro — маршрут /; hero-shell фазы 2 (D-13): моно-метка «01 / HOME»,
-// имя в Unbounded display, primary CTA «Смотреть работы» → /work с иконкой
-// IconArrowRight. Текст формулы обещания и подписей — фаза 3 (REQ-main-promise);
-// CTA — единственное место первичного действия. Без клиентского JS (UI-SPEC).
+// index.astro — маршрут /: hero с формулой обещания (03-UI-SPEC Q5, тексты
+// дословно D-13; CTA — последний элемент секции) + секция «Избранные работы»
+// (R4): featured-фильтр поверх сортировки по order (D-09, Pitfall 10).
+// Карточки — паттерн work.astro (03-03): ProjectCard + Media/Image + Tags.
+// Без клиентского JS (UI-SPEC).
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import IconArrowRight from '../components/IconArrowRight.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Media from '../components/Media.astro';
+import Tag from '../components/Tag.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.filter((p) => p.data.featured);
 ---
 <BaseLayout
   title="Иван Шиваршинов — веб-разработчик с продуктовым подходом"
   description="Создаю и развиваю сложные сайты, контентные системы и веб-инструменты."
   pageLabel="01 / HOME"
 >
-  <section class="hero">
-    <h1 class="hero__name">Иван Шиваршинов</h1>
-    <Button href="/work" density="lg">
-      Смотреть работы
-      <IconArrowRight />
-    </Button>
+  <section class="home">
+    <div class="hero">
+      <h1 class="hero__name">Иван Шиваршинов</h1>
+      <div class="hero__formula">
+        <p class="hero__lead">Создаю и развиваю сложные сайты, контентные системы и веб-инструменты.</p>
+        <p class="hero__mono">Product-minded web developer.</p>
+        <p class="hero__body">Соединяю Webflow, код, SEO/AEO и возможности ИИ…</p>
+        <p class="hero__body">веб-разработчик с продуктовым подходом</p>
+        <p class="hero__sign">от идеи и структуры до запуска и дальнейшего развития</p>
+      </div>
+      <Button href="/work" density="lg">
+        Смотреть работы
+        <IconArrowRight />
+      </Button>
+    </div>
+
+    <div class="featured">
+      <SectionHeading meta="SELECTED WORK" title="Избранные работы" layout="split" />
+      <div class="featured__list">
+        {featured.map((p) => (
+          <ProjectCard
+            title={p.data.title}
+            meta={`${p.data.role} · ${p.data.year}`}
+            theme={p.data.theme}
+            summary={p.data.summary}
+            href={`/work/${p.data.slug}/`}
+          >
+            <Media slot="media" ratio="4:3">
+              <Image class="card-img" src={p.data.cover} alt={p.data.coverAlt} />
+            </Media>
+            {p.data.stack.slice(0, 3).map((s) => (
+              <Tag label={s} theme={p.data.theme} />
+            ))}
+          </ProjectCard>
+        ))}
+      </div>
+    </div>
   </section>
 </BaseLayout>
 
 <style>
+  .home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
   .hero {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
   }
   /* Имя hero: display-типографика (D-13, UI-SPEC Typography Display);
      clamp(28px, 5vw, 40px) — на 320px «Шиваршинов» ≈231px < 272px колонки */
@@ -35,6 +81,66 @@ import IconArrowRight from '../components/IconArrowRight.astro';
     font-size: var(--text-display);
     font-weight: 600;
     line-height: 1.2;
+    margin: 0;
     max-width: 100%;
+  }
+  /* Формула обещания (Q5, ритм --space-md): Lead → моно-слой → Body →
+     категория → подпись. Тексты дословно (D-13) — без редактирования */
+  .hero__formula {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .hero__lead {
+    font-family: var(--font-sans);
+    font-size: var(--text-lead);
+    line-height: 1.4;
+    color: var(--color-ink);
+    margin: 0;
+    max-width: 65ch;
+  }
+  .hero__mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+  .hero__body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+    margin: 0;
+    max-width: 65ch;
+  }
+  .hero__sign {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+  .featured {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+  .featured__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+  /* Скриншот заполняет Media-фрейм 4:3 (overflow hidden в Media) */
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Число 768 = --bp-md (сверяет check-tokens): на ≥768px — 3 колонки карточек */
+  @media (min-width: 768px) {
+    .featured__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 </style>
