@@ -111,7 +111,27 @@ Plans:
   4. Capabilities поданы иерархией Build / Improve / Extend без длинного списка инструментов; Lab Preview показывает мост к продуктам, AI и автоматизациям.
   5. Тексты всего сайта соответствуют тону: спокойный, конкретный, технически грамотный, без хайпа и лишних англицизмов.
 
-**Plans**: TBD
+**Plans**: 6 plans planned
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Контракты фазы: схема projects (theme/featured/cover/coverAlt) + коллекция contacts + границы коллекций в check-collections
+- [ ] 03-02-PLAN.md — Проверки фазы: новый check-tone (денлист ≥10 + ассерты), check-tokens (W1 на кейсах, 1 script на /contact), check-seo (5 + N)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-03-PLAN.md — Tracer: состав кейсов (решение) + первый кейс end-to-end (MDX, ProjectCard summary/href, /work из коллекции, /work/{slug}/) + утверждение K1–K4
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-04-PLAN.md — Контакты: значения (D-12), contacts.json, /contact с копированием email, футер со ссылками
+- [ ] 03-05-PLAN.md — Страницы контента: /about (4 блока), /lab (2 блока), / (формула D-13 + избранные), check-visual под новые страницы
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-06-PLAN.md — Кейсы 2–6 + финальный гейт: verify-цепочка с check-tone, полный прогон, 03-VERIFICATION.md (K1–K4, ручной проход тона)
+
 **UI hint**: yes
 
 ### Phase 4: Прототип индекса работ
