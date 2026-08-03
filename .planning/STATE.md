@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-current_phase_name: Контент и страницы
+current_phase: 03
+current_phase_name: kontent-i-stranicy
 status: executing
-stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-08-03T15:48:13.423Z"
+stopped_at: Completed 03-01-PLAN.md (схема projects, коллекция contacts, границы коллекций)
+last_updated: "2026-08-03T16:14:49.713Z"
 last_activity: 2026-08-03
-last_activity_desc: Phase 02 complete, transitioned to Phase 3
+last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 19
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Состояние проекта
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-31)
 
 **Core value:** Портфолио подтверждает позиционирование «веб-разработчик с продуктовым подходом»: центральная интерактивная механика (индекс работ) — осмысленное доказательство компетенции, а не декоративный эффект
-**Current focus:** Phase 02 — vizualnaya-sistema
+**Current focus:** Phase 03 — kontent-i-stranicy
 
 ## Current Position
 
-Phase: 3 — Контент и страницы
-Plan: Not started
+Phase: 03 (kontent-i-stranicy) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-08-03 — Phase 02 complete, transitioned to Phase 3
+Last activity: 2026-08-03 — Phase 03 execution started
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 74%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [██████████] 100%
 | Phase 02-vizualnaya-sistema P04 | 10 | 3 tasks | 13 files |
 | Phase 02-vizualnaya-sistema P05 | 15 | 2 tasks | 2 files |
 | Phase 02-vizualnaya-sistema P06 | 8h 48m | 2 tasks | 5 files |
+| Phase 03 P01 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Progress: [██████████] 100%
 - [Phase ?]: [02-06 T2 FIX] Классы в атрибутах Astro — шаблонные литералы class={`button button--${variant}`}: Astro 7.1.6/@astrojs/compiler 2.13.1 НЕ интерполирует {expr} внутри кавычек строкового атрибута (class="button button--{variant}" рендерится буквально — CTA без стиля кнопки, дефект визуального прохода 02-06). Форма шаблонного литерала интерполируется — закреплена как конвенция
 - [Phase ?]: [02-06 T2 FIX] Регрессионное правило 10 в check-tokens.mjs: запрет голых {expr} в кавычках атрибутов .astro-шаблонов src/ (regex name="...{...}"); frontmatter исключается; self-test фикстуры bad-attr FAIL / ok-attr PASS — quirk компилятора не вернётся без красного verify
 - [Phase ?]: [02-06 Task 2] Протокол финального гейта фиксирует полную историю визуального прохода (дефект → root cause → фикс → повторная верификация → re-approval) в 02-VERIFICATION.md — честный вход для /gsd-verify-work (паттерн 01-VERIFICATION.md)
+- [Phase ?]: 03-01: cover/coverAlt через image()-хелпер схемы (R8): build-level гарантия существования файла, резолв относительно папки записи — единственный механизм без grep-проверки импортов
+- [Phase ?]: 03-01: duplicateSlugTest пишет временный PNG 1×1 (zz-check-cover.png) и удаляет в finally — падение сборки строго от DuplicateContentEntrySlugError, а не от zod (Pitfall 9 закрыт)
+- [Phase ?]: 03-01: аудит границ коллекций — чистые функции (countBoundaries/featuredBoundaries/themeBoundary/bodyAudit/coverDupAudit/notesBoundary) + реальный прогон; парсинг frontmatter regex-матчами строк без YAML-библиотеки
 
 ### Pending Todos
 
@@ -140,6 +144,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T14:51:31.605Z
-Stopped at: Phase 3 UI-SPEC approved
-Resume file: .planning/phases/03-kontent-i-stranicy/03-UI-SPEC.md
+Last session: 2026-08-03T16:14:49.690Z
+Stopped at: Completed 03-01-PLAN.md (схема projects, коллекция contacts, границы коллекций)
+Resume file: None
