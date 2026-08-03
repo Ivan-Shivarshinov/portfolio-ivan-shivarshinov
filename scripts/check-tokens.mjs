@@ -32,6 +32,10 @@
 // 8. Grep-контроль использования (R3): каждый из 8 компонентов (Button, Link, SectionHeading,
 //    ProjectCard, Media, Tag, Nav, Footer) импортирован хотя бы в одном файле src/pages|src/layouts.
 // 9. В собранных страницах dist 0 тегов <script> (R4).
+// 10. Голые {expr} в кавычках атрибутов .astro-шаблонов src/ (регрессия 02-06):
+//     Astro 7.x не интерполирует подстроки внутри "..." — class="x {v}" рендерится
+//     буквально, элемент остаётся без стиля. Допустимо: шаблонный литерал
+//     class={`x ${v}`} или статический класс. Frontmatter исключается ({…} в JS-строках легитимен).
 //
 // Exit 0 — нарушений нет; exit 1 — есть нарушения (вывод списка).
 
@@ -87,6 +91,10 @@ const TRANSITION_DECL_RE = /transition(?:-property|-duration|-timing-function)?\
 const TRANSITION_LITERAL_RE =
   /(?<![\w-])(?:ease(?:-in-out|-in|-out)?|linear)(?=[\s,;)]|$)|cubic-bezier\s*\(|\d+ms/gi;
 
+// Голый {expr} в кавычках атрибута (.astro-шаблоны): name="...{...}..." — Astro 7.x
+// не интерполирует внутри "..." (регрессия 02-06). Шаблонные литералы (`...`) не матчатся.
+const ATTR_BARE_EXPR_RE = /\b[a-zA-Z][a-zA-Z0-9_-]*\s*=\s*(["'])[^"']*\{[^}]*\}[^"']*\1/g;
+
 // Grep-контроль использования (R3): 8 компонентов визуальной системы.
 const USAGE_COMPONENTS = ['Button', 'Link', 'SectionHeading', 'ProjectCard', 'Media', 'Tag', 'Nav', 'Footer'];
 
@@ -122,6 +130,20 @@ function routeForFile(relPath) {
   const m = norm.match(/^(.*)\/index\.html$/);
   if (m) return '/' + m[1];
   return '/' + norm.replace(/\.html$/, '');
+}
+
+/**
+ * Убирает Astro-frontmatter (всё между первым и вторым ---): JS-строки frontmatter
+ * могут содержать {…} (const label = "{n} шт.") — они не атрибуты и не должны
+ * срабатывать на правило интерполяции. Шаблонная часть возвращается без изменений.
+ */
+function stripFrontmatter(text) {
+  if (!text.startsWith('---')) return text;
+  const lines = text.split('\n');
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === '---') return lines.slice(i + 1).join('\n');
+  }
+  return text;
 }
 
 /**
@@ -280,13 +302,33 @@ function audit(rootDir) {
     }
   }
 
+  // 10. Голые {expr} в кавычках атрибутов (регрессия 02-06): Astro 7.x не интерполирует
+  //     подстроки внутри "..." — атрибут уходит в HTML буквально, элемент без стиля.
+  //     Сканируются только .astro-шаблоны src/ (frontmatter вырезан).
+  for (const f of walk(join(rootDir, 'src'), ['.astro'])) {
+    const r = rel(f);
+    let text;
+    try {
+      text = stripFrontmatter(readText(f));
+    } catch (err) {
+      violations.push(`не удалось прочитать ${r}: ${err.message}`);
+      continue;
+    }
+    const found = [...new Set(text.match(ATTR_BARE_EXPR_RE) ?? [])];
+    if (found.length > 0) {
+      violations.push(
+        `голый {expr} в кавычках атрибута (Astro не интерполирует внутри "..."): ${r}: ${found.join(', ')}`
+      );
+    }
+  }
+
   return violations;
 }
 
 function render(violations) {
   if (violations.length === 0) {
     console.log(
-      'check-tokens: OK — единый файл токенов, 6 групп, требуемые токены, bp/медиа-сверка, transition-токены, W1, использование компонентов, 0 <script>'
+      'check-tokens: OK — единый файл токенов, 6 групп, требуемые токены, bp/медиа-сверка, transition-токены, интерполяция атрибутов, W1, использование компонентов, 0 <script>'
     );
     return 0;
   }
@@ -397,7 +439,8 @@ function writeFixture(root, relPath, content) {
  *     dist отсутствует → W1/script-проверки пропущены с предупреждением, не fail.
  * (b) bad-bp — нет bp-группы; (c) bad-media — 767px + max-width;
  * (d) bad-transition — литерал 150ms ease; (e) bad-dist / good-dist — W1;
- * (f) bad-usage — нет импорта Footer; (g) bad-script — <script> в dist.
+ * (f) bad-usage — нет импорта Footer; (g) bad-script — <script> в dist;
+ * (h) bad-attr / (i) ok-attr — голый {expr} в кавычках атрибута vs шаблонный литерал.
  */
 function runSelfTest() {
   let failures = 0;
@@ -503,6 +546,37 @@ function runSelfTest() {
     writeFixture(badScriptRoot, 'dist/index.html', SCRIPT_INDEX_BAD);
     const badScript = audit(badScriptRoot);
     assert(hasViolation(badScript, '<script>'), 'bad-script: тег <script> в dist детектируется');
+
+    // (h) bad-attr: голый {expr} в кавычках атрибута — Astro 7.x рендерит буквально (02-06)
+    const badAttrRoot = join(tmp, 'bad-attr');
+    writeFixture(badAttrRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(
+      badAttrRoot,
+      'src/components/Card.astro',
+      GOOD_COMPONENT.replace('<div class="card">{title}</div>', '<a class="card card--{mod}">{title}</a>')
+    );
+    const badAttr = audit(badAttrRoot);
+    assert(
+      hasViolation(badAttr, 'в кавычках атрибута') && hasViolation(badAttr, 'card--{mod}'),
+      'bad-attr: голый {expr} в кавычках атрибута детектируется'
+    );
+
+    // (i) ok-attr: шаблонный литерал, текстовая интерполяция и frontmatter-{…} → чисто
+    const okAttrRoot = join(tmp, 'ok-attr');
+    writeFixture(okAttrRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(
+      okAttrRoot,
+      'src/components/Card.astro',
+      GOOD_COMPONENT.replace(
+        'const title = "Компонент";',
+        'const title = "Компонент";\nconst note = "{n} шт.";'
+      ).replace('<div class="card">{title}</div>', '<a class={`card card--${mod}`}>{title} {note}</a>')
+    );
+    const okAttr = audit(okAttrRoot);
+    assert(
+      okAttr.length === 0,
+      `ok-attr: шаблонный литерал, текстовая интерполяция и frontmatter-{…} не нарушение (получено: ${JSON.stringify(okAttr)})`
+    );
 
     // Старые правила не сломаны
     const badHexRoot = join(tmp, 'bad-hex');
