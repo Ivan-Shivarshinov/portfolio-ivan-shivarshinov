@@ -3,7 +3,8 @@
 // и контрактов фазы 2 (02-01-PLAN.md Task 1, 02-VALIDATION.md Wave 0 gaps 2/3/5):
 // единый файл токенов, 6 групп CSS-переменных, запрет хардкод-значений,
 // наличие токенов фазы 2, сверка чисел media-запросов с bp-токенами,
-// grep-правило transition-токенов, W1-ассерт по dist, использование компонентов, 0 <script> в dist.
+// grep-правило transition-токенов, W1-ассерт по dist, использование компонентов,
+// ровно 1 <script> на /contact (D-10).
 //
 // CLI:
 //   node scripts/check-tokens.mjs           — аудит src/ (+ dist/, если собран) относительно корня проекта
@@ -26,12 +27,16 @@
 // 6. Grep-правило transition (R4): в src/components переходы задаются только через
 //    var(--motion-*) и var(--ease-*); литералы \d+ms / cubic-bezier( / ease-слова / linear → нарушение.
 //    src/styles не сканируется (global.css владеет kill-switch 0ms).
-// 7. W1-ассерт по dist/**/*.html (R2): ровно один aria-current="page" на страницу, href элемента
-//    соответствует маршруту файла (index.html → '/', {name}/index.html → '/{name}').
+// 7. W1-ассерт по dist/**/*.html (R2): на верхнеуровневых страницах ровно один
+//    aria-current="page", href элемента соответствует маршруту файла (index.html → '/',
+//    {name}/index.html → '/{name}'). На страницах кейсов (work/{slug}/index.html) ровно 0 —
+//    маршруты кейсов не входят в Nav, Work не помечается активным (Pitfall 1).
 //    dist отсутствует → предупреждение, не fail (guard auditDist).
 // 8. Grep-контроль использования (R3): каждый из 8 компонентов (Button, Link, SectionHeading,
 //    ProjectCard, Media, Tag, Nav, Footer) импортирован хотя бы в одном файле src/pages|src/layouts.
-// 9. В собранных страницах dist 0 тегов <script> (R4).
+// 9. В собранных страницах dist ровно 1 тег <script> суммарно — единственный в
+//    contact/index.html (D-10: копирование email — первый клиентский JS); на остальных
+//    страницах 0 тегов (AC R4/R5, Pitfall 2).
 // 10. Голые {expr} в кавычках атрибутов .astro-шаблонов src/ (регрессия 02-06):
 //     Astro 7.x не интерполирует подстроки внутри "..." — class="x {v}" рендерится
 //     буквально, элемент остаётся без стиля. Допустимо: шаблонный литерал
@@ -278,26 +283,48 @@ function audit(rootDir) {
     if (distHtml.length === 0) {
       console.warn('check-tokens: в dist/ нет собранных .html страниц — W1-ассерт и проверка <script> пропущены');
     } else {
+      let totalScripts = 0;
       for (const f of distHtml) {
         const html = readText(f);
         const r = rel(f);
-        if (/<script/gi.test(html)) {
-          violations.push(`тег <script> в собранной странице ${r} (клиентский JS запрещён, AC R4/R5)`);
+        const relDist = relative(distDir, f).replaceAll('\\', '/');
+
+        // Правило 9 (D-10, Pitfall 2): скрипт допустим только на contact/index.html —
+        // копирование email, первый клиентский JS сайта.
+        const scriptCount = (html.match(/<script/gi) ?? []).length;
+        totalScripts += scriptCount;
+        if (scriptCount > 0 && relDist !== 'contact/index.html') {
+          violations.push(
+            `тег <script> в собранной странице ${r} (клиентский JS разрешён только на /contact, D-10)`
+          );
         }
+
+        // Правило 7 (W1, R2): страницы кейсов work/{slug}/index.html — ровно 0 aria-current
+        // (маршруты кейсов не входят в Nav, Work НЕ помечается активным, Pitfall 1);
+        // верхнеуровневые страницы — ровно 1 с верным href.
         const current = [...html.matchAll(/aria-current="page"/g)];
-        if (current.length !== 1) {
+        if (/^work\/[^/]+\/index\.html$/.test(relDist)) {
+          if (current.length !== 0) {
+            violations.push(
+              `W1: ${r}: страница кейса не может иметь aria-current="page" (найдено ${current.length}, R2)`
+            );
+          }
+        } else if (current.length !== 1) {
           violations.push(`W1: ${r}: ожидалось ровно 1 aria-current="page", найдено ${current.length} (R2)`);
         } else {
           const el = html.match(/<\s*[^>]*\baria-current\s*=\s*"page"[^>]*>/i);
           const hrefMatch = el ? el[0].match(/\bhref\s*=\s*["']([^"']*)["']/i) : null;
           const href = hrefMatch ? hrefMatch[1] : null;
-          const route = routeForFile(relative(distDir, f).replaceAll('\\', '/'));
+          const route = routeForFile(relDist);
           if (!href) {
             violations.push(`W1: ${r}: у элемента с aria-current="page" нет атрибута href (R2)`);
           } else if (href !== route) {
             violations.push(`W1: ${r}: href="${href}" не соответствует маршруту ${route} (R2)`);
           }
         }
+      }
+      if (totalScripts !== 1) {
+        violations.push(`всего тегов <script>: ${totalScripts}, ожидалось 1 (клиентский JS разрешён только на /contact, D-10)`);
       }
     }
   }
@@ -328,7 +355,7 @@ function audit(rootDir) {
 function render(violations) {
   if (violations.length === 0) {
     console.log(
-      'check-tokens: OK — единый файл токенов, 6 групп, требуемые токены, bp/медиа-сверка, transition-токены, интерполяция атрибутов, W1, использование компонентов, 0 <script>'
+      'check-tokens: OK — единый файл токенов, 6 групп, требуемые токены, bp/медиа-сверка, transition-токены, интерполяция атрибутов, W1 (0 на кейсах), использование компонентов, 1 <script> на /contact'
     );
     return 0;
   }
@@ -426,6 +453,31 @@ const SCRIPT_INDEX_BAD = `<!doctype html>
 <script>window.__x = 1;</script>
 <nav><a href="/" aria-current="page">Главная</a></nav>
 </body></html>`;
+// Фикстуры правил 7/9 фазы 3 (Pitfall 1/2): страница кейса с 0 aria-current,
+// первый клиентский JS — только на /contact (D-10).
+const W1_CASE_GOOD = `<!doctype html>
+<html><body>
+<nav><a href="/work">Работы</a></nav>
+</body></html>`;
+const W1_CASE_BAD = `<!doctype html>
+<html><body>
+<nav><a href="/work" aria-current="page">Работы</a></nav>
+</body></html>`;
+const SCRIPT_CONTACT_GOOD = `<!doctype html>
+<html><body>
+<script>/* копирование email */</script>
+<nav><a href="/contact" aria-current="page">Контакты</a></nav>
+</body></html>`;
+const SCRIPT_WORK_BAD = `<!doctype html>
+<html><body>
+<script>window.__x = 1;</script>
+<nav><a href="/work" aria-current="page">Работы</a></nav>
+</body></html>`;
+const SCRIPT_TOTAL_BAD = `<!doctype html>
+<html><body>
+<script>window.__x = 1;</script>
+<nav><a href="/" aria-current="page">Главная</a></nav>
+</body></html>`;
 
 function writeFixture(root, relPath, content) {
   const abs = join(root, relPath);
@@ -439,8 +491,11 @@ function writeFixture(root, relPath, content) {
  *     dist отсутствует → W1/script-проверки пропущены с предупреждением, не fail.
  * (b) bad-bp — нет bp-группы; (c) bad-media — 767px + max-width;
  * (d) bad-transition — литерал 150ms ease; (e) bad-dist / good-dist — W1;
- * (f) bad-usage — нет импорта Footer; (g) bad-script — <script> в dist;
- * (h) bad-attr / (i) ok-attr — голый {expr} в кавычках атрибута vs шаблонный литерал.
+ * (f) bad-usage — нет импорта Footer; (g) bad-script — <script> вне /contact;
+ * (h) bad-attr / (i) ok-attr — голый {expr} в кавычках атрибута vs шаблонный литерал;
+ * (j) w1-case — кейс без aria-current → чисто (Pitfall 1); (k) w1-case-bad — кейс с aria-current → FAIL;
+ * (l) script-contact — 1 скрипт на /contact → чисто (D-10); (m) script-work — скрипт на work → FAIL;
+ * (n) script-total — два скрипта (contact + index) → FAIL по сумме.
  */
 function runSelfTest() {
   let failures = 0;
@@ -469,6 +524,7 @@ function runSelfTest() {
     writeFixture(goodDistRoot, 'src/pages/index.astro', GOOD_PAGE);
     writeFixture(goodDistRoot, 'dist/index.html', W1_INDEX_GOOD);
     writeFixture(goodDistRoot, 'dist/work/index.html', W1_WORK_GOOD);
+    writeFixture(goodDistRoot, 'dist/contact/index.html', SCRIPT_CONTACT_GOOD); // единственный скрипт (D-10)
     const goodDist = audit(goodDistRoot);
     assert(
       goodDist.length === 0,
@@ -511,19 +567,22 @@ function runSelfTest() {
       'bad-transition: литералы 150ms/ease в transition детектируются'
     );
 
-    // (e) bad-dist: 2 aria-current на index, неверный href на work
+    // (e) bad-dist: 2 aria-current на index, неверный href на work;
+    //     contact с единственным скриптом — правило 9 (D-10) не вмешивается в W1-проверку
     const badDistRoot = join(tmp, 'bad-dist');
     writeFixture(badDistRoot, 'src/styles/tokens.css', GOOD_TOKENS);
     writeFixture(badDistRoot, 'src/components/Card.astro', GOOD_COMPONENT);
     writeFixture(badDistRoot, 'src/pages/index.astro', GOOD_PAGE);
     writeFixture(badDistRoot, 'dist/index.html', W1_INDEX_BAD);
     writeFixture(badDistRoot, 'dist/work/index.html', W1_WORK_BAD_HREF);
+    writeFixture(badDistRoot, 'dist/contact/index.html', SCRIPT_CONTACT_GOOD);
     const badDist = audit(badDistRoot);
     assert(
       hasViolation(badDist, 'W1: dist/index.html') &&
         hasViolation(badDist, 'найдено 2') &&
-        hasViolation(badDist, 'href="/lab"'),
-      'bad-dist: 2 aria-current и неверный href детектируются'
+        hasViolation(badDist, 'href="/lab"') &&
+        !badDist.some((v) => v.includes('<script>')),
+      'bad-dist: 2 aria-current и неверный href детектируются, скрипт на /contact не нарушение'
     );
 
     // (f) bad-usage: страница без импорта Footer
@@ -538,14 +597,17 @@ function runSelfTest() {
     const badUsage = audit(badUsageRoot);
     assert(hasViolation(badUsage, 'Footer'), 'bad-usage: неиспользуемый компонент Footer детектируется');
 
-    // (g) bad-script: <script> в собранной странице
+    // (g) bad-script: <script> на странице вне /contact → нарушение (правило 9, D-10)
     const badScriptRoot = join(tmp, 'bad-script');
     writeFixture(badScriptRoot, 'src/styles/tokens.css', GOOD_TOKENS);
     writeFixture(badScriptRoot, 'src/components/Card.astro', GOOD_COMPONENT);
     writeFixture(badScriptRoot, 'src/pages/index.astro', GOOD_PAGE);
     writeFixture(badScriptRoot, 'dist/index.html', SCRIPT_INDEX_BAD);
     const badScript = audit(badScriptRoot);
-    assert(hasViolation(badScript, '<script>'), 'bad-script: тег <script> в dist детектируется');
+    assert(
+      hasViolation(badScript, 'тег <script>') && hasViolation(badScript, 'разрешён только на /contact'),
+      'bad-script: <script> вне /contact детектируется (правило 9, D-10)'
+    );
 
     // (h) bad-attr: голый {expr} в кавычках атрибута — Astro 7.x рендерит буквально (02-06)
     const badAttrRoot = join(tmp, 'bad-attr');
@@ -576,6 +638,68 @@ function runSelfTest() {
     assert(
       okAttr.length === 0,
       `ok-attr: шаблонный литерал, текстовая интерполяция и frontmatter-{…} не нарушение (получено: ${JSON.stringify(okAttr)})`
+    );
+
+    // (j) w1-case: страница кейса work/{slug}/index.html без aria-current → чисто (Pitfall 1)
+    const w1CaseRoot = join(tmp, 'w1-case');
+    writeFixture(w1CaseRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(w1CaseRoot, 'src/components/Card.astro', GOOD_COMPONENT);
+    writeFixture(w1CaseRoot, 'src/pages/index.astro', GOOD_PAGE);
+    writeFixture(w1CaseRoot, 'dist/work/zz/index.html', W1_CASE_GOOD);
+    writeFixture(w1CaseRoot, 'dist/contact/index.html', SCRIPT_CONTACT_GOOD); // единственный скрипт (D-10)
+    const w1Case = audit(w1CaseRoot);
+    assert(
+      w1Case.length === 0,
+      `w1-case: кейс без aria-current → чисто (получено: ${JSON.stringify(w1Case)})`
+    );
+
+    // (k) w1-case-bad: страница кейса С aria-current → нарушение
+    const w1CaseBadRoot = join(tmp, 'w1-case-bad');
+    writeFixture(w1CaseBadRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(w1CaseBadRoot, 'src/components/Card.astro', GOOD_COMPONENT);
+    writeFixture(w1CaseBadRoot, 'src/pages/index.astro', GOOD_PAGE);
+    writeFixture(w1CaseBadRoot, 'dist/work/zz/index.html', W1_CASE_BAD);
+    const w1CaseBad = audit(w1CaseBadRoot);
+    assert(
+      hasViolation(w1CaseBad, 'страница кейса не может иметь aria-current'),
+      'w1-case-bad: aria-current на странице кейса детектируется (R2)'
+    );
+
+    // (l) script-contact: ровно 1 скрипт на /contact → чисто (D-10, первый клиентский JS)
+    const scriptContactRoot = join(tmp, 'script-contact');
+    writeFixture(scriptContactRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(scriptContactRoot, 'src/components/Card.astro', GOOD_COMPONENT);
+    writeFixture(scriptContactRoot, 'src/pages/index.astro', GOOD_PAGE);
+    writeFixture(scriptContactRoot, 'dist/contact/index.html', SCRIPT_CONTACT_GOOD);
+    const scriptContact = audit(scriptContactRoot);
+    assert(
+      scriptContact.length === 0,
+      `script-contact: скрипт на /contact → чисто (получено: ${JSON.stringify(scriptContact)})`
+    );
+
+    // (m) script-work: скрипт на work/index.html → нарушение (JS разрешён только на /contact)
+    const scriptWorkRoot = join(tmp, 'script-work');
+    writeFixture(scriptWorkRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(scriptWorkRoot, 'src/components/Card.astro', GOOD_COMPONENT);
+    writeFixture(scriptWorkRoot, 'src/pages/index.astro', GOOD_PAGE);
+    writeFixture(scriptWorkRoot, 'dist/work/index.html', SCRIPT_WORK_BAD);
+    const scriptWork = audit(scriptWorkRoot);
+    assert(
+      hasViolation(scriptWork, 'разрешён только на /contact'),
+      'script-work: скрипт на work/index.html детектируется'
+    );
+
+    // (n) script-total: два скрипта (contact + index) → нарушение по сумме (ожидалось 1)
+    const scriptTotalRoot = join(tmp, 'script-total');
+    writeFixture(scriptTotalRoot, 'src/styles/tokens.css', GOOD_TOKENS);
+    writeFixture(scriptTotalRoot, 'src/components/Card.astro', GOOD_COMPONENT);
+    writeFixture(scriptTotalRoot, 'src/pages/index.astro', GOOD_PAGE);
+    writeFixture(scriptTotalRoot, 'dist/contact/index.html', SCRIPT_CONTACT_GOOD);
+    writeFixture(scriptTotalRoot, 'dist/index.html', SCRIPT_TOTAL_BAD);
+    const scriptTotal = audit(scriptTotalRoot);
+    assert(
+      hasViolation(scriptTotal, 'всего тегов <script>: 2, ожидалось 1'),
+      'script-total: сумма тегов ≠ 1 детектируется'
     );
 
     // Старые правила не сломаны
