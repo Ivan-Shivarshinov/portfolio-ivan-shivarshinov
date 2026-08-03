@@ -11,7 +11,7 @@ interface Props {
 const { variant = 'default', href } = Astro.props;
 ---
 
-<a class="link link--{variant}" href={href}>
+<a class={`link link--${variant}`} href={href}>
   <slot />
 </a>
 

@@ -13,7 +13,7 @@ interface Props {
 const { variant = 'primary', density = 'md', href } = Astro.props;
 ---
 
-<a class="button button--{variant} button--{density}" href={href}>
+<a class={`button button--${variant} button--${density}`} href={href}>
   <slot />
 </a>
 
