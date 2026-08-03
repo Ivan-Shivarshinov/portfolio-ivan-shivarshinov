@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: kontent-i-stranicy
 status: executing
-stopped_at: Completed 03-01-PLAN.md (схема projects, коллекция contacts, границы коллекций)
-last_updated: "2026-08-03T16:14:49.713Z"
+stopped_at: "Completed 03-02-PLAN.md (валидационный каркас: check-tone, правила 7/9 check-tokens, параметризация check-seo)"
+last_updated: "2026-08-03T16:28:56.762Z"
 last_activity: 2026-08-03
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 19
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 03 (kontent-i-stranicy) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-08-03 — Phase 03 execution started
 
-Progress: [███████░░░] 74%
+Progress: [████████░░] 79%
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: [███████░░░] 74%
 | Phase 02-vizualnaya-sistema P05 | 15 | 2 tasks | 2 files |
 | Phase 02-vizualnaya-sistema P06 | 8h 48m | 2 tasks | 5 files |
 | Phase 03 P01 | 5 | 2 tasks | 2 files |
+| Phase 03-kontent-i-stranicy P02 | 9 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,11 @@ Progress: [███████░░░] 74%
 - [Phase ?]: 03-01: cover/coverAlt через image()-хелпер схемы (R8): build-level гарантия существования файла, резолв относительно папки записи — единственный механизм без grep-проверки импортов
 - [Phase ?]: 03-01: duplicateSlugTest пишет временный PNG 1×1 (zz-check-cover.png) и удаляет в finally — падение сборки строго от DuplicateContentEntrySlugError, а не от zod (Pitfall 9 закрыт)
 - [Phase ?]: 03-01: аудит границ коллекций — чистые функции (countBoundaries/featuredBoundaries/themeBoundary/bodyAudit/coverDupAudit/notesBoundary) + реальный прогон; парсинг frontmatter regex-матчами строк без YAML-библиотеки
+- [Phase ?]: Денлист тона стартует с 22 stem-записей (Code Example 4 03-RESEARCH + «эксперт мирового класса»); сверка с финальным контентом — прогон 03-06 по dist, порог не ниже 10 записей (R9, A4). Потребитель: 03-03…03-06 (тексты страниц под денлист).
+- [Phase ?]: Ярлыки позиционирования — группа INDEX_LABELS (5 записей), scope только dist/index.html: «Product Engineer» легален в траектории /about (Pitfall 7/A5); «Product-minded web developer» — разрешённая категория (D-13), в денлист не входит. Потребитель: 03-04 (About TRAJECTORY), 03-05 (hero).
+- [Phase ?]: Правило 9 check-tokens: ровно 1 тег <script> суммарно по dist, только на contact/index.html (D-10 — копирование email, первый клиентский JS); сайт без скрипта — нарушение, текущий dist (0) — ожидаемый red до 03-05. Потребитель: 03-05 (contact.astro copy-скрипт).
+- [Phase ?]: Правило 7 check-tokens: страницы кейсов work/{slug}/index.html (regex ^work/[^/]+/index.html$) — ровно 0 aria-current (Pitfall 1); верхнеуровневые — ровно 1 с верным href. Потребитель: 03-03/03-04 (страницы кейсов).
+- [Phase ?]: check-seo параметризован фактом из коллекции: EXPECTED_PAGES = 5 + N записей src/content/projects (computeExpectedPages, Open Question 1); граница 5–6 остаётся контрактом check-collections, check-seo не дублирует её. Потребитель: 03-03 (наполнение кейсов — число страниц 10–11).
 
 ### Pending Todos
 
@@ -144,6 +150,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T16:14:49.690Z
-Stopped at: Completed 03-01-PLAN.md (схема projects, коллекция contacts, границы коллекций)
+Last session: 2026-08-03T16:28:56.728Z
+Stopped at: Completed 03-02-PLAN.md (валидационный каркас: check-tone, правила 7/9 check-tokens, параметризация check-seo)
 Resume file: None

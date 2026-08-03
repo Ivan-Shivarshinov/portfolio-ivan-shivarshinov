@@ -111,13 +111,13 @@ Plans:
   4. Capabilities поданы иерархией Build / Improve / Extend без длинного списка инструментов; Lab Preview показывает мост к продуктам, AI и автоматизациям.
   5. Тексты всего сайта соответствуют тону: спокойный, конкретный, технически грамотный, без хайпа и лишних англицизмов.
 
-**Plans**: 1/6 plans executed
+**Plans**: 2/6 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 03-01-PLAN.md — Контракты фазы: схема projects (theme/featured/cover/coverAlt) + коллекция contacts + границы коллекций в check-collections
-- [ ] 03-02-PLAN.md — Проверки фазы: новый check-tone (денлист ≥10 + ассерты), check-tokens (W1 на кейсах, 1 script на /contact), check-seo (5 + N)
+- [x] 03-02-PLAN.md — Проверки фазы: новый check-tone (денлист ≥10 + ассерты), check-tokens (W1 на кейсах, 1 script на /contact), check-seo (5 + N)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -190,7 +190,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
 | 2. Визуальная система | 6/6 | Complete    | 2026-08-03 |
-| 3. Контент и страницы | 1/6 | In Progress|  |
+| 3. Контент и страницы | 2/6 | In Progress|  |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |
 | 6. Качество и запуск | TBD | Not started | - |
