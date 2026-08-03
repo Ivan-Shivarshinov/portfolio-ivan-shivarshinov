@@ -1,35 +1,122 @@
 ---
-// about.astro — маршрут /about; оболочка фазы 2: моно-метка «04 / ABOUT» (D-05)
-// + empty-state D-04 (честный статус «раздел в разработке»). Реальный контент
-// (о себе) — фаза 3. Title/description — уникальная пара R4.
+// about.astro — маршрут /about (R5): 4 блока — PROFILE / AUDIENCES /
+// CAPABILITIES / TRAJECTORY. Тексты — черновик по D-04, утверждаются
+// пользователем до коммита. Каждый блок: SectionHeading (layout="split"
+// на ≥768px) + проза по prose-контракту (Manrope 16px, ~65ch, слева).
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Link from '../components/Link.astro';
+import SectionHeading from '../components/SectionHeading.astro';
 ---
 <BaseLayout
   title="Обо мне — Иван Шиваршинов"
-  description="Веб-разработчик с продуктовым подходом."
+  description="Кто я как разработчик: профиль, аудитории, компетенции Build / Improve / Extend и траектория роста."
   pageLabel="04 / ABOUT"
 >
-  <div class="empty-state">
-    <p class="empty-state__caption">ABOUT — раздел в разработке</p>
-    <Link href="/">На главную</Link>
-  </div>
+  <section class="about">
+    <div class="about__block">
+      <SectionHeading meta="PROFILE" title="Профиль" layout="split" />
+      <div class="about__prose">
+        <p>Начинал как веб-разработчик на Webflow и постепенно расширял диапазон: архитектура CMS, техническое SEO, мультиязычность, интеграции, кастомный код. Сейчас закрываю задачи от размытой идеи до опубликованного и работающего решения — сам выбираю инструменты и отвечаю за результат.</p>
+        <p>Работаю продуктово: не жду полностью готового технического задания, а помогаю определить реальную задачу. Думаю о пользователе и бизнес-цели, о поддержке и дальнейшем развитии, а не только о сборке страницы. В работе использую ИИ как производственный рычаг — ответственность за архитектуру и качество остаётся на мне.</p>
+        <p>Честно о границах: доказанная специализация — сложные сайты и контентные системы. Направление роста — веб-инструменты, автоматизации и небольшие цифровые продукты: они уже появляются в проектах и со временем станут центральной частью практики.</p>
+      </div>
+    </div>
+
+    <div class="about__block">
+      <SectionHeading meta="AUDIENCES" title="Аудитории" layout="split" />
+      <div class="about__prose">
+        <p>Работаю с командами, которым нужен не просто свёрстанный сайт, а работающая система, которую можно развивать. Четыре типичные ситуации:</p>
+        <ul>
+          <li><strong>Запустить</strong> — сайт, новый раздел, мультиязычная версия, контентный центр или интерактивный материал.</li>
+          <li><strong>Привести в порядок</strong> — CMS, индексация, canonical, формы, аналитика, структура страниц, доступность, технический долг.</li>
+          <li><strong>Развивать</strong> — регулярно добавлять функциональность и контент, улучшать поисковую видимость и сценарии пользователей.</li>
+          <li><strong>Расширить</strong> — интеграции, автоматизация, AI-функции, калькулятор, внутренний инструмент или быстрый MVP.</li>
+        </ul>
+        <p>Чаще всего это технологические компании и SaaS-команды, юридические и консалтинговые фирмы, B2B-компании со сложным контентом, команды, которым нужен самостоятельный технический партнёр по веб-направлению, агентства и дизайнеры.</p>
+        <p>Мне важно, чтобы меня воспринимали именно так — как самостоятельного технического партнёра: можно передать не только готовый макет, но и не до конца сформулированную задачу — и получить реалистичное решение, рабочую реализацию и понятный следующий шаг.</p>
+      </div>
+    </div>
+
+    <div class="about__block">
+      <SectionHeading meta="CAPABILITIES" title="Компетенции" layout="split" />
+      <div class="about__prose">
+        <p>Компетенции выстроены в три группы: от понятного результата через доказанную специализацию к направлению роста.</p>
+        <h3>Build — создание</h3>
+        <p>Сайты и контентные системы: разработка, архитектура CMS, адаптивная реализация, кастомный фронтенд, миграции и интеграции. Результат — работающий сайт, который удобно развивать.</p>
+        <h3>Improve — развитие</h3>
+        <p>Техническое SEO и готовность к AI-поиску, аналитика и согласия, перформанс и доступность, регулярное развитие работающих проектов. Результат — больше охвата и стабильность.</p>
+        <h3>Extend — расширение</h3>
+        <p>Интерактивные инструменты, AI-воркфлоу, автоматизация процессов, внутренние веб-инструменты, быстрые прототипы и MVP. Результат — новые возможности поверх существующих систем.</p>
+        <p>Это не перечень инструментов и не «делаю всё»: технологии подбираются под задачу, а главный вопрос — какой результат нужен.</p>
+      </div>
+    </div>
+
+    <div class="about__block">
+      <SectionHeading meta="TRAJECTORY" title="Траектория" layout="split" />
+      <div class="about__prose">
+        <p>Куда движется практика — три ступени:</p>
+        <h3>Product-minded Web Developer</h3>
+        <p>Текущая позиция: сильная веб-база, продуктовый подход, широкий диапазон задач; Webflow и контентные системы — основная доказанная специализация.</p>
+        <h3>Web Product Developer</h3>
+        <p>Следующая ступень: появляется после убедительных кейсов с интерактивными инструментами, автоматизациями, MVP и внутренними системами.</p>
+        <h3>Product Engineer</h3>
+        <p>Долгосрочная роль: потребует укрепления full-stack базы — архитектуры, backend, баз данных, тестирования и эксплуатации продуктов.</p>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .empty-state {
+  .about {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
-    padding: var(--space-lg);
+    gap: var(--space-2xl);
   }
-  .empty-state__caption {
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    line-height: 1.4;
+  .about__block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  /* Проза — prose-контракт (UI-SPEC): Manrope 16px 400 / 1.5, мера ~65ch,
+     выравнивание по левому краю (без центрирования текста) */
+  .about__prose p {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-md);
+    max-width: 65ch;
+  }
+  .about__prose p:last-child {
+    margin-bottom: 0;
+  }
+  /* Списки — по prose-контракту: отступ var(--space-lg), маркеры muted */
+  .about__prose ul {
+    margin: 0 0 var(--space-md);
+    padding-inline-start: var(--space-lg);
+  }
+  .about__prose li {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-sm);
+    max-width: 65ch;
+  }
+  .about__prose li:last-child {
+    margin-bottom: 0;
+  }
+  .about__prose li::marker {
     color: var(--color-ink-muted);
-    margin: 0;
+  }
+  .about__prose strong {
+    font-weight: 600;
+  }
+  /* h3 в прозе — prose-контракт: Unbounded 16px 600 / 1.2 (16px = --text-body) */
+  .about__prose h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: var(--space-lg) 0 var(--space-sm);
   }
 </style>

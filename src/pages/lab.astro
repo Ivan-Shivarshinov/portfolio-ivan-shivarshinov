@@ -1,33 +1,94 @@
 ---
-// lab.astro — маршрут /lab; оболочка фазы 2: моно-метка «03 / LAB» (D-05)
-// + empty-state D-04 (честный статус «раздел в разработке»). Реальный контент
-// (эксперименты) — фаза 3. Title/description — уникальная пара R4.
+// lab.astro — маршрут /lab (R6): 2 блока — DIRECTIONS / PROCESS + честная
+// статусная строка. Без карточек экспериментов и без ссылок на несуществующие
+// эксперименты (R6 AC): контент не притворяется, что они существуют.
+// Тексты — черновик по D-04, утверждаются пользователем до коммита.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Link from '../components/Link.astro';
+import SectionHeading from '../components/SectionHeading.astro';
 ---
 <BaseLayout
   title="Лаборатория — Иван Шиваршинов"
-  description="Эксперименты, веб-инструменты и мост к продуктам."
+  description="Лаборатория экспериментов: направления — AI-воркфлоу, автоматизации, внутренние инструменты — и процесс работы."
   pageLabel="03 / LAB"
 >
-  <div class="empty-state">
-    <p class="empty-state__caption">LAB — раздел в разработке</p>
-    <Link href="/">На главную</Link>
-  </div>
+  <section class="lab">
+    <div class="lab__block">
+      <SectionHeading meta="DIRECTIONS" title="Направления" layout="split" />
+      <div class="lab__prose">
+        <p>Раздел, где появляются эксперименты: вещи, которые готовят переход от сайтов к веб-инструментам и продуктам. Сейчас здесь три направления:</p>
+        <ul>
+          <li><strong>AI-воркфлоу</strong> — процессы, в которых ИИ становится частью разработки: от черновиков и прототипов до проверки результата.</li>
+          <li><strong>Автоматизации</strong> — связывание инструментов и данных, чтобы убрать рутинные шаги из работы команды.</li>
+          <li><strong>Внутренние инструменты</strong> — небольшие веб-приложения, которые решают конкретную задачу там, где готовый сервис не подходит.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lab__block">
+      <SectionHeading meta="PROCESS" title="Процесс" layout="split" />
+      <div class="lab__prose">
+        <p>Каждый эксперимент проходит одинаковый путь:</p>
+        <ul>
+          <li>гипотеза — какая задача стоит и почему существующее решение не подходит;</li>
+          <li>минимальный прототип — проверка гипотезы на реальном сценарии;</li>
+          <li>решение — то, что показало результат, идёт в работу; остальное закрывается честно и с выводом.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="lab__status">Эксперименты в работе — появятся в следующих релизах</p>
+  </section>
 </BaseLayout>
 
 <style>
-  .empty-state {
+  .lab {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
-    padding: var(--space-lg);
+    gap: var(--space-2xl);
   }
-  .empty-state__caption {
+  .lab__block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  /* Проза — prose-контракт (UI-SPEC): Manrope 16px 400 / 1.5, мера ~65ch */
+  .lab__prose p {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-md);
+    max-width: 65ch;
+  }
+  .lab__prose p:last-child {
+    margin-bottom: 0;
+  }
+  .lab__prose ul {
+    margin: 0 0 var(--space-md);
+    padding-inline-start: var(--space-lg);
+  }
+  .lab__prose li {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-sm);
+    max-width: 65ch;
+  }
+  .lab__prose li:last-child {
+    margin-bottom: 0;
+  }
+  .lab__prose li::marker {
+    color: var(--color-ink-muted);
+  }
+  .lab__prose strong {
+    font-weight: 600;
+  }
+  /* Честный статус (R6 AC): моно-слой, caption, muted — строка фиксируется,
+     на неё ссылается check-tone REQUIRED_CONTENT */
+  .lab__status {
     font-family: var(--font-mono);
-    font-size: var(--text-label);
+    font-size: var(--text-caption);
     line-height: 1.4;
     color: var(--color-ink-muted);
     margin: 0;
