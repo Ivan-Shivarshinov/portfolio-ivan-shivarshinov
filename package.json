@@ -15,7 +15,8 @@
     "check-theme": "node scripts/check-theme.mjs",
     "check-collections": "node scripts/check-collections.mjs",
     "check-spike-doc": "node scripts/check-spike-doc.mjs",
-    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-contrast && npm run check-collections && node scripts/check-prohibitions.mjs"
+    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-contrast && npm run check-collections && node scripts/check-prohibitions.mjs && npm run check-visual",
+    "check-visual": "node scripts/check-visual.mjs"
   },
   "engines": {
     "node": ">=22.22.3"
@@ -31,6 +32,7 @@
     "@typescript-eslint/parser": "^8.65.0",
     "eslint": "^10.8.0",
     "eslint-plugin-astro": "^3.0.1",
+    "playwright-core": "^1.62.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^6.0.3"
