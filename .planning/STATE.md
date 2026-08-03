@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 current_phase_name: vizualnaya-sistema
-status: executing
-stopped_at: "Checkpoint 02-06 Task 2 — visual pass 320/375/768/1200 + reduced-motion + neutral calm awaiting user (Task 1 done: verify green, pushed, CI green)"
-last_updated: "2026-08-02T21:54:37.281Z"
+status: verifying
+stopped_at: "Phase 02 complete — final gate closed: verify green, CI green, visual pass approved (defect fixed: Astro attr interpolation)"
+last_updated: "2026-08-03T06:37:24.029Z"
 last_activity: 2026-08-02
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Состояние проекта
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 
 Phase: 02 (vizualnaya-sistema) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-02 — Phase 02 execution started
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [█████████░] 92%
 | Phase 02-vizualnaya-sistema P03 | 14 | 2 tasks | 14 files |
 | Phase 02-vizualnaya-sistema P04 | 10 | 3 tasks | 13 files |
 | Phase 02-vizualnaya-sistema P05 | 15 | 2 tasks | 2 files |
+| Phase 02-vizualnaya-sistema P06 | 8h 48m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,9 @@ Progress: [█████████░] 92%
 - [Phase ?]: [02-04 T2] ACCENTS в ProjectCard с кавыченными ключами ('terracotta': ...) — verify-строка плана проверяет буквально «'terracotta': 'var(--color-accent)'»; значения идентичны маппингу Tag (семантически тот же контракт, оформление ключей разное)
 - [Phase ?]: [02-05 T1] SYSTEM DEMO на work.astro — детерминированный fallback-узел grep-контроля использования (UI-SPEC Page structure); фикстурные карточки с маркером // fixture: replaced in phase 3 (AC#7)
 - [Phase ?]: [02-05 T2] hero-default (D-12) зафиксирован в docs/hero-concept.md: index.astro не изменяется (hero-shell 02-03 = D-13-минимум), обоснование по D-14, статус макета по D-15
+- [Phase ?]: [02-06 T2 FIX] Классы в атрибутах Astro — шаблонные литералы class={`button button--${variant}`}: Astro 7.1.6/@astrojs/compiler 2.13.1 НЕ интерполирует {expr} внутри кавычек строкового атрибута (class="button button--{variant}" рендерится буквально — CTA без стиля кнопки, дефект визуального прохода 02-06). Форма шаблонного литерала интерполируется — закреплена как конвенция
+- [Phase ?]: [02-06 T2 FIX] Регрессионное правило 10 в check-tokens.mjs: запрет голых {expr} в кавычках атрибутов .astro-шаблонов src/ (regex name="...{...}"); frontmatter исключается; self-test фикстуры bad-attr FAIL / ok-attr PASS — quirk компилятора не вернётся без красного verify
+- [Phase ?]: [02-06 Task 2] Протокол финального гейта фиксирует полную историю визуального прохода (дефект → root cause → фикс → повторная верификация → re-approval) в 02-VERIFICATION.md — честный вход для /gsd-verify-work (паттерн 01-VERIFICATION.md)
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-02T21:54:37.265Z
-Stopped at: Checkpoint 02-06 Task 2 — visual pass 320/375/768/1200 + reduced-motion + neutral calm awaiting user (Task 1 done: verify green, pushed, CI green)
-Resume file: 02-06-PLAN.md
+Last session: 2026-08-03T06:37:24.011Z
+Stopped at: Phase 02 complete — final gate closed: verify green, CI green, visual pass approved (defect fixed: Astro attr interpolation)
+Resume file: None
