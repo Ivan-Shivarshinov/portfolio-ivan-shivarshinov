@@ -41,9 +41,11 @@ const SERVICES_FILE = join(ROOT, 'src/data/services.json');
 const FIXTURE_PREFIX = 'zz-check-';
 const BUILD_TIMEOUT_MS = 300_000;
 
-// Схемо-совместимый frontmatter projects (01-04-PLAN.md: slug, title, summary, role, stack,
-// year, status enum, client-type, order default 0, titleEn optional) — падение сборки должно быть
-// именно из-за дубликата slug, а не из-за отсутствующего поля.
+// Схемо-совместимый frontmatter projects (01-04-PLAN.md + 03-01-PLAN.md: theme/featured/
+// cover/coverAlt добавлены в схему фазы 3) — падение сборки должно быть именно из-за
+// дубликата slug, а не из-за отсутствующего поля (Pitfall 9). theme: clay — валидное
+// значение; терракота кейсам не назначается (D-06). cover — путь к временному PNG
+// (zz-check-cover.png), который duplicateSlugTest пишет и удаляет.
 function projectFixture(slug) {
   return `---
 slug: ${slug}
@@ -55,10 +57,22 @@ year: 2026
 status: "active"
 client-type: "fixture"
 order: 999
+theme: clay
+featured: false
+cover: './zz-check-cover.png'
+coverAlt: fixture
 ---
 Временная фикстура ${slug} — удаляется в finally.
 `;
 }
+
+// Минимальный PNG 1×1 (base64) — файл cover для фикстур (image() в схеме требует
+// существующий файл при сборке; Pitfall 9: падение строго от DuplicateContentEntrySlugError).
+const COVER_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'base64'
+);
+const COVER_FIXTURE = join(PROJECTS_DIR, 'zz-check-cover.png');
 
 // notes: схемо-совместимо, но БЕЗ обязательного поля title (date — coerce.date, summary — optional)
 const NOTE_FIXTURE_NO_TITLE = `---
@@ -131,6 +145,9 @@ function duplicateSlugTest() {
   const a = join(PROJECTS_DIR, `${FIXTURE_PREFIX}dup-a.mdx`);
   const b = join(PROJECTS_DIR, `${FIXTURE_PREFIX}dup-b.mdx`);
   try {
+    // cover-файл фикстуры: image() в схеме (03-01) требует существующий файл при сборке —
+    // иначе тест упадёт по zod-ошибке поля, а не от дубликата slug (Pitfall 9).
+    writeFileSync(COVER_FIXTURE, COVER_PNG);
     writeFixture(a, projectFixture(DUP_SLUG));
     writeFixture(b, projectFixture(DUP_SLUG));
     const { status, stderr } = runBuild();
@@ -138,7 +155,7 @@ function duplicateSlugTest() {
       report('дубликат slug (projects)', false, 'сборка НЕ упала (ожидался exit != 0, DuplicateContentEntrySlugError)');
       return;
     }
-    const isDupError = /DuplicateContentEntrySlugError|same slug/i.test(stderr);
+    const isDupError = /DuplicateContentEntrySlugError|same slug|Duplicate slug/i.test(stderr);
     report(
       'дубликат slug (projects)',
       true,
@@ -147,6 +164,7 @@ function duplicateSlugTest() {
   } finally {
     rmSafe(a);
     rmSafe(b);
+    rmSafe(COVER_FIXTURE);
   }
 }
 
@@ -220,6 +238,109 @@ function collectFiles(dir, acc = []) {
   return acc;
 }
 
+// --- Аудит границ коллекций (03-01-PLAN.md Task 2): чистые функции + реальный прогон ---
+
+const THEME_ENUM = ['terracotta', 'clay', 'olive', 'slate', 'plum'];
+// Четыре раздела тела кейса (D-05): ровно по одному разу в MDX-теле (RESEARCH Code Example 2)
+const BODY_HEADINGS = ['## Проблема', '## Ответственность', '## Решение', '## Результат'];
+
+// Значение frontmatter-поля простым regex-матчем строки (стиль проекта, без YAML-библиотеки);
+// кавычки снимаются. Пустая строка — поле отсутствует.
+function frontmatterField(content, field) {
+  const m = content.match(new RegExp(`^${field}:\\s*(.+)$`, 'm'));
+  if (!m) return '';
+  return m[1].trim().replace(/^['"]|['"]$/g, '');
+}
+
+// Тело MDX — всё после закрывающего `---` frontmatter
+function mdxBody(content) {
+  const lines = content.split('\n');
+  let fences = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === '---') fences++;
+    if (fences === 2) return lines.slice(i + 1).join('\n');
+  }
+  return content;
+}
+
+// Граница числа записей projects: [5, 6] (SPEC edge R2 — падает при 4 и при 7, «0 записей = FAIL»)
+function countBoundaries(count) {
+  return count >= 5 && count <= 6 ? null : `записей: ${count}, ожидалось 5–6`;
+}
+
+// Граница featured-записей: [2, 3] (D-09)
+function featuredBoundaries(n) {
+  return n >= 2 && n <= 3 ? null : `featured-записей: ${n}, ожидалось 2–3`;
+}
+
+// Тема: enum из 5 значений (D-05); terracotta кейсам не назначается (D-06)
+function themeBoundary(theme) {
+  if (!THEME_ENUM.includes(theme)) return `theme «${theme}» вне enum (D-05)`;
+  if (theme === 'terracotta') return 'theme terracotta запрещена кейсам (D-06)';
+  return null;
+}
+
+// Тело кейса: 4 раздела, каждый ровно один раз (indexOf === -1 → отсутствует,
+// indexOf !== lastIndexOf → повторяется)
+function bodyAudit(body) {
+  const problems = [];
+  for (const h of BODY_HEADINGS) {
+    const first = body.indexOf(h);
+    if (first === -1) problems.push(`раздел «${h}» отсутствует в теле`);
+    else if (body.indexOf(h, first + h.length) !== -1) problems.push(`раздел «${h}» повторяется в теле`);
+  }
+  return problems;
+}
+
+// Дубль файла cover между кейсами (SPEC edge R8 adjacency): нормализованные пути уникальны
+function coverDupAudit(coverPaths) {
+  return new Set(coverPaths).size === coverPaths.length ? null : 'дубль файла cover между кейсами';
+}
+
+// notes: 0 записей .md (D-07, контракт 01-04)
+function notesBoundary(n) {
+  return n === 0 ? null : `notes: ${n} записей, ожидалось 0 (D-07)`;
+}
+
+// Реальный прогон по src/content/projects: все границы разом, без сборки (паттерн walk())
+function auditCaseBoundaries() {
+  const problems = [];
+  const files = collectFiles(PROJECTS_DIR).filter((p) => p.endsWith('.mdx'));
+  const countProblem = countBoundaries(files.length);
+  if (countProblem) problems.push(countProblem);
+  const coverPaths = [];
+  let featured = 0;
+  for (const f of files) {
+    const content = readFileSync(f, 'utf8');
+    const theme = themeBoundary(frontmatterField(content, 'theme'));
+    if (theme) problems.push(`${basename(f)}: ${theme}`);
+    if (frontmatterField(content, 'featured') === 'true') featured++;
+    const cover = frontmatterField(content, 'cover');
+    if (!cover) {
+      problems.push(`${basename(f)}: cover не задан (R8)`);
+    } else {
+      // cover резолвится относительно директории записи (как image() в схеме)
+      const abs = resolve(dirname(f), cover);
+      if (!existsSync(abs)) problems.push(`${basename(f)}: файл cover не существует (${cover})`);
+      coverPaths.push(abs);
+    }
+    for (const bp of bodyAudit(mdxBody(content))) problems.push(`${basename(f)}: ${bp}`);
+  }
+  const featuredProblem = featuredBoundaries(featured);
+  if (featuredProblem) problems.push(featuredProblem);
+  const dupProblem = coverDupAudit(coverPaths);
+  if (dupProblem) problems.push(dupProblem);
+  return problems;
+}
+
+// Реальный прогон по src/content/notes: 0 записей .md
+function auditNotesBoundary() {
+  if (!existsSync(NOTES_DIR)) return [];
+  const noteCount = collectFiles(NOTES_DIR).filter((p) => p.endsWith('.md')).length;
+  const problem = notesBoundary(noteCount);
+  return problem ? [problem] : [];
+}
+
 // --- Self-test: фикстуры на временной директории БЕЗ запуска build ---
 
 function runSelfTest() {
@@ -258,6 +379,46 @@ function runSelfTest() {
 
     // rmSafe на несуществующем файле не бросает
     rmSafe(join(tmp, 'нет-такого-файла.mdx'));
+
+    // --- новые аудиты границ (03-01-PLAN.md Task 2): чистые функции на inline-фикстурах ---
+
+    // countBoundaries: 5 и 6 → PASS, 4 / 7 / 0 → FAIL
+    assert(countBoundaries(5) === null && countBoundaries(6) === null, 'countBoundaries: 5 и 6 → PASS');
+    assert(countBoundaries(4) !== null, 'countBoundaries: 4 → FAIL');
+    assert(countBoundaries(7) !== null, 'countBoundaries: 7 → FAIL');
+    assert(countBoundaries(0) !== null, 'countBoundaries: 0 → FAIL');
+
+    // featuredBoundaries: 2 и 3 → PASS, 1 / 4 → FAIL
+    assert(featuredBoundaries(2) === null && featuredBoundaries(3) === null, 'featuredBoundaries: 2 и 3 → PASS');
+    assert(featuredBoundaries(1) !== null, 'featuredBoundaries: 1 → FAIL');
+    assert(featuredBoundaries(4) !== null, 'featuredBoundaries: 4 → FAIL');
+
+    // themeBoundary: plum → PASS, terracotta → FAIL (D-06), невалидное → FAIL
+    assert(themeBoundary('plum') === null, 'themeBoundary: plum → PASS');
+    assert(themeBoundary('terracotta') !== null, 'themeBoundary: terracotta → FAIL (D-06)');
+    assert(themeBoundary('невалидное') !== null, 'themeBoundary: невалидное → FAIL');
+
+    // bodyAudit: 4 раздела по одному разу → PASS
+    const goodBody = '## Проблема\nтекст\n## Ответственность\nтекст\n## Решение\nтекст\n## Результат\nтекст';
+    assert(bodyAudit(goodBody).length === 0, 'bodyAudit: 4 раздела по одному разу → PASS');
+    // без «## Решение» → FAIL
+    assert(
+      bodyAudit('## Проблема\n## Ответственность\n## Результат').some((p) => p.includes('«## Решение»')),
+      'bodyAudit: без «## Решение» → FAIL'
+    );
+    // повторённый «## Проблема» → FAIL
+    assert(
+      bodyAudit('## Проблема\n## Проблема\n## Ответственность\n## Решение\n## Результат').some((p) => p.includes('повторяется')),
+      'bodyAudit: повторённый «## Проблема» → FAIL'
+    );
+
+    // coverDupAudit: разные файлы → PASS, одинаковый cover → FAIL
+    assert(coverDupAudit(['a.png', 'b.png']) === null, 'coverDupAudit: разные файлы → PASS');
+    assert(coverDupAudit(['a.png', 'a.png']) !== null, 'coverDupAudit: одинаковый cover между кейсами → FAIL');
+
+    // notesBoundary: 0 → PASS, 1 запись → FAIL
+    assert(notesBoundary(0) === null, 'notesBoundary: 0 → PASS');
+    assert(notesBoundary(1) !== null, 'notesBoundary: 1 запись → FAIL');
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -266,7 +427,7 @@ function runSelfTest() {
     console.error(`self-test: ${failures} сбоев логики`);
     return false;
   }
-  console.log('self-test: OK — создание/удаление фикстур и backup/restore работают');
+  console.log('self-test: OK — фикстуры, backup/restore и аудиты границ работают');
   return true;
 }
 
@@ -299,6 +460,16 @@ if (process.argv.includes('--self-test')) {
     console.error(`FAIL  чистота дерева — ${p}`);
   }
   if (leftover.length === 0) console.log('OK    рабочее дерево чисто от фикстур');
+
+  console.log('check-collections: аудит границ коллекций...');
+  const boundaryProblems = [...auditCaseBoundaries(), ...auditNotesBoundary()];
+  for (const p of boundaryProblems) {
+    failed++;
+    console.error(`FAIL  аудит границ — ${p}`);
+  }
+  if (boundaryProblems.length === 0) {
+    console.log('OK    границы коллекций соблюдены (projects 5–6, featured 2–3, theme без terracotta, cover-файлы, 4 h2, notes 0)');
+  }
 
   if (failed > 0) {
     console.error(`check-collections: FAIL — ${failed} из ${passed + failed} проверок провалены`);
