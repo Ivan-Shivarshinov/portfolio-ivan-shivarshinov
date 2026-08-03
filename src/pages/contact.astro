@@ -1,35 +1,203 @@
 ---
-// contact.astro — маршрут /contact; оболочка фазы 2: моно-метка «05 / CONTACT» (D-05)
-// + empty-state D-04 (честный статус «раздел в разработке»). Реальный контент
-// (контакты) — фаза 3. Title/description — уникальная пара R4.
+// contact.astro — маршрут /contact: 3 канала из единого источника
+// src/data/contacts.json (D-11, AC R7 «ссылки идентичны» футеру обеспечиваются
+// источником). Копирование email — первый клиентский JS сайта (D-10):
+// прогрессивное улучшение поверх mailto (ссылка работает и без JS).
+// Значения каналов — от пользователя (D-12), утверждены до коммита.
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
 import Link from '../components/Link.astro';
+import IconMail from '../components/IconMail.astro';
+import IconTelegram from '../components/IconTelegram.astro';
+import IconGithub from '../components/IconGithub.astro';
+import IconCopy from '../components/IconCopy.astro';
+import IconCheck from '../components/IconCheck.astro';
+
+const contacts = await getCollection('contacts');
+const email = contacts.find((c) => c.id === 'email');
+
+const ICONS: Record<string, typeof IconMail> = {
+  email: IconMail,
+  telegram: IconTelegram,
+  github: IconGithub,
+};
 ---
+
 <BaseLayout
   title="Контакты — Иван Шиваршинов"
-  description="Связаться со мной для проекта или консультации."
+  description="Связаться со мной для проекта или консультации: email, Telegram, GitHub."
   pageLabel="05 / CONTACT"
 >
-  <div class="empty-state">
-    <p class="empty-state__caption">CONTACT — раздел в разработке</p>
-    <Link href="/">На главную</Link>
-  </div>
+  <section class="contact">
+    <SectionHeading meta="CONTACT" title="Контакты" />
+    <ul class="contact__list">
+      {contacts.map((c) => {
+        const Icon = ICONS[c.id] ?? IconMail;
+        return (
+          <li class="contact__row">
+            <Icon size={24} />
+            <span class="contact__label">{c.data.label}</span>
+            {email && c.id === 'email' ? (
+              <>
+                <Link href={email.data.href}>{email.data.value}</Link>
+                {/* data-copy БЕЗ кавычек — правило 10 check-tokens (Pitfall 3):
+                    кавычки вокруг {expr} в Astro 7 рендерятся буквально */}
+                <button
+                  type="button"
+                  class="copy-btn"
+                  data-copy={email.data.value}
+                  aria-describedby="copy-status"
+                >
+                  <span id="copy-status" class="copy-status" aria-live="polite">Копировать</span>
+                  <span class="copy-btn__icon copy-btn__icon--copy"><IconCopy /></span>
+                  <span class="copy-btn__icon copy-btn__icon--check"><IconCheck /></span>
+                </button>
+              </>
+            ) : (
+              <a class="contact__value" href={c.data.href} target="_blank" rel="noopener">
+                {c.data.value}
+              </a>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </section>
 </BaseLayout>
 
+<script>
+  // Первый клиентский JS сайта (D-10): копирование email — прогрессивное
+  // улучшение поверх mailto. navigator.clipboard в secure-контексте, fallback —
+  // execCommand('copy') через временный textarea (position: fixed, opacity: 0,
+  // readOnly — без клавиатуры на мобильных). Состояния: idle «Копировать» →
+  // ok «Скопировано» + IconCheck, авто-сброс ≈2 с; ошибка «Не удалось
+  // скопировать — выделите адрес вручную». Статус — span с aria-live="polite".
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy]');
+  if (btn) {
+    const status = btn.querySelector('.copy-status');
+    const copyText = btn.dataset.copy;
+    if (status && copyText) {
+      const fallback = (text: string) => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+        document.body.removeChild(ta);
+        return ok;
+      };
+      btn.addEventListener('click', async () => {
+        let ok = false;
+        if (window.isSecureContext && navigator.clipboard) {
+          try {
+            await navigator.clipboard.writeText(copyText);
+            ok = true;
+          } catch {
+            ok = fallback(copyText);
+          }
+        } else {
+          ok = fallback(copyText);
+        }
+        status.textContent = ok ? 'Скопировано' : 'Не удалось скопировать — выделите адрес вручную';
+        btn.classList.toggle('is-copied', ok);
+        if (ok) {
+          setTimeout(() => {
+            status.textContent = 'Копировать';
+            btn.classList.remove('is-copied');
+          }, 2000);
+        }
+      });
+    }
+  }
+</script>
+
 <style>
-  .empty-state {
+  .contact {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
-    padding: var(--space-lg);
+    gap: var(--space-xl);
   }
-  .empty-state__caption {
+  .contact__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+  }
+  /* Строка канала: колонка во всю ширину, перенос естественный, без nowrap
+     (UI-SPEC overflow: нет горизонтального скролла на 320px) */
+  .contact__row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    padding-block: var(--space-md);
+    border-bottom: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+  }
+  .contact__label {
     font-family: var(--font-mono);
     font-size: var(--text-label);
     line-height: 1.4;
     color: var(--color-ink-muted);
-    margin: 0;
+  }
+  /* Value-ссылка: контракт Link.astro (ink → accent + underline в hover/focus),
+     но внешние ссылки (TG/GitHub) требуют target/rel — Link.astro их не
+     форвардит, поэтому внешние — plain <a> с тем же визуальным контрактом */
+  .contact__value {
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+  .contact__value:hover,
+  .contact__value:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px; /* 2px — вне шкалы, разрешено */
+  }
+  /* Кнопка копирования — контракт Button secondary density lg (UI-SPEC Q2):
+     border 1px line, hover border-ink + color-accent, padding md/lg, моно label;
+     focus ring 2px accent — глобальный :focus-visible в global.css */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink);
+    background: transparent;
+    border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    cursor: pointer;
+    transition:
+      border-color var(--motion-fast) var(--ease-standard),
+      color var(--motion-fast) var(--ease-standard);
+  }
+  .copy-btn:hover {
+    border-color: var(--color-ink);
+    color: var(--color-accent);
+  }
+  .copy-btn:active {
+    translate: 0 1px; /* 1px — compositor-only сдвиг, вне шкалы */
+  }
+  /* Смена иконки idle → copied: IconCopy видна, IconCheck скрыт и наоборот */
+  .copy-btn__icon--check {
+    display: none;
+  }
+  .copy-btn.is-copied .copy-btn__icon--copy {
+    display: none;
+  }
+  .copy-btn.is-copied .copy-btn__icon--check {
+    display: inline-flex;
   }
 </style>

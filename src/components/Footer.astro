@@ -1,17 +1,39 @@
 ---
-// Footer.astro — структурный футер оболочки (D-03): одна моно-строка
-// «© 2026 · Иван Шиваршинов» + Latin-метка раздела (HOME/WORK/...),
-// тонкая верхняя граница 1px var(--color-line). Ссылки и колонки — фаза 3.
+// Footer.astro — структурный футер: моно-строка «© 2026 · Иван Шиваршинов» +
+// ссылки контактов из коллекции contacts (D-11 — единый источник с /contact,
+// AC R7 «ссылки идентичны» обеспечивается источником, не проверкой) +
+// Latin-метка раздела. Тонкая верхняя граница 1px var(--color-line).
+// <768px: две строки — контакты (переносятся без горизонтального скролла на
+// 320px) + копирайт с меткой; ≥768px: одна строка — копирайт слева, ссылки и
+// метка справа (UI-SPEC Q3). Внешние ссылки — target="_blank" rel="noopener"
+// (T-03-10); mailto — та же вкладка.
+import { getCollection } from 'astro:content';
+
 interface Props {
   sectionLabel: string;
 }
 
 const { sectionLabel } = Astro.props;
+const contacts = await getCollection('contacts');
+
+// Внешние (TG/GitHub) — target/rel, mailto — без атрибутов (Link.astro-контракт:
+// caller передаёт, компонент не зашивает)
+const extAttrs = (href: string) =>
+  href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {};
 ---
 
 <footer class="footer">
   <div class="footer__row">
-    <span>© 2026 · Иван Шиваршинов</span>
+    <span class="footer__copyright">© 2026 · Иван Шиваршинов</span>
+    <ul class="footer__contacts">
+      {contacts.map((c) => (
+        <li class="footer__contact">
+          <a class="footer__link" href={c.data.href} {...extAttrs(c.data.href)}>
+            {c.data.label}
+          </a>
+        </li>
+      ))}
+    </ul>
     <span class="footer__section">{sectionLabel}</span>
   </div>
 </footer>
@@ -23,8 +45,9 @@ const { sectionLabel } = Astro.props;
   }
   .footer__row {
     display: flex;
-    justify-content: space-between;
-    gap: var(--space-md);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-md);
     max-width: var(--container-max);
     margin-inline: auto;
     padding-inline: var(--gutter-mobile);
@@ -33,12 +56,51 @@ const { sectionLabel } = Astro.props;
     line-height: 1.4;
     color: var(--color-ink-muted);
   }
+  /* <768px: контакты — первая строка (full-width), копирайт и метка — вторая */
+  .footer__contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    order: 1;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .footer__copyright {
+    order: 2;
+    margin-right: auto; /* десктоп: прижимает контакты и метку вправо */
+  }
   .footer__section {
+    order: 3;
     text-transform: uppercase;
   }
+  .footer__link {
+    display: inline-flex;
+    align-items: center;
+    padding-block: var(--space-md); /* hit-area ≥44px (паттерн Nav, 02-UI-SPEC) */
+    color: inherit;
+    text-decoration: none;
+    text-transform: uppercase; /* label в верхнем регистре (UI-SPEC Q3) */
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+  .footer__link:hover {
+    color: var(--color-ink);
+  }
+  /* ≥768px: одна строка — копирайт слева, контакты + метка справа (UI-SPEC Q3) */
   @media (min-width: 768px) {
     .footer__row {
       padding-inline: var(--gutter-desktop);
+    }
+    .footer__contacts {
+      order: 0;
+      width: auto;
+    }
+    .footer__copyright {
+      order: 0;
+    }
+    .footer__section {
+      order: 0;
     }
   }
 </style>

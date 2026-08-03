@@ -1,0 +1,20 @@
+[
+  {
+    "id": "email",
+    "label": "Email",
+    "value": "ivan.shivarshinov@gmail.com",
+    "href": "mailto:ivan.shivarshinov@gmail.com"
+  },
+  {
+    "id": "telegram",
+    "label": "Telegram",
+    "value": "@ivan_shivarshinov",
+    "href": "https://t.me/ivan_shivarshinov"
+  },
+  {
+    "id": "github",
+    "label": "GitHub",
+    "value": "Ivan-Shivarshinov",
+    "href": "https://github.com/Ivan-Shivarshinov"
+  }
+]
