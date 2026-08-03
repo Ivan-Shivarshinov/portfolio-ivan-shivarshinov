@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: kontent-i-stranicy
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-03
+reviewed_at: 2026-08-03
 ---
 
 # Phase 3 — UI Design Contract
@@ -209,20 +210,28 @@ All copy in Russian (D-08); Latin caps only inside the mono technical layer (pag
 
 Phase 3 surfaces (probe): hero formula, featured list, work list, case study page (long-form prose + header meta + bottom nav), contact channel list + copy button (first interactive JS), footer with links, About/Lab prose blocks.
 
-Applicable state considerations resolved: **12 covered, 0 backstop, 0 unresolved** — remainder dismissed with reasons.
+Applicable state considerations resolved: **16 covered, 0 backstop, 0 unresolved** — remainder dismissed with reasons. Full probe reconciliation (8 surfaces × applicable categories, ui-consideration-probe 2026-08-03) — no silent drops.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
 | long-text | case study prose (MDX body) | ✅ covered | Prose contract: 16px/1.5, measure ≈65ch, h2/h3 sizes declared — wraps, no truncation |
 | long-text | About/Lab blocks | ✅ covered | Same prose contract; block rhythm `--space-2xl` |
+| long-text | work/featured card titles | ✅ covered | Real collection titles (2–6 words) + fixed meta; wrap within card padding `--space-md` — no ellipsis |
 | populated | work list | ✅ covered | 5–6 cards from collection (boundary enforced by check-collections: FAIL at 4 and 7); 2-col grid ≥768px |
 | populated | featured list | ✅ covered | 2–3 featured cards (check-collections range 2–3), order by `order`, links to `/work/{slug}/` |
+| populated | hero, case page, footer, About, Lab | ⛔ dismissed | Fixed static content — always populated by construction (static SSG, no data source) |
 | zero-one-many | work list | ✅ covered | 0 records = FAIL (boundary 5–6, R2 AC); no empty-render path by contract |
 | zero-one-many | featured list | ✅ covered | 2–3 enforced by check-collections (D-09); outside range = build FAIL |
+| zero-one-many | case bottom nav | ✅ covered | «Следующий кейс» wraps to first by `order` — defined for any 1..N cases |
+| zero-one-many | contact channels, footer, Lab blocks | ⛔ dismissed | Fixed counts by contract: 3 channels (D-11/R7), footer from same source, Lab exactly 2 blocks (R6) |
 | empty | lab | ✅ covered | Honest status line instead of fake experiment cards (R6 AC); notes collection stays 0 (D-07, no UI) |
+| empty | hero, case page, contact, footer, About | ⛔ dismissed | Always-present static content — no data source, no empty-render path |
 | error | copy button | ✅ covered | Clipboard error state with hint; mailto remains the working path without JS (D-10) |
+| error | hero, work, featured, case, footer, About, Lab | ⛔ dismissed | Only client-side JS is the copy button (click-only, no fetch); no load/submit failure surfaces |
 | overflow | footer contacts | ✅ covered | <768px: contacts row wraps to two lines; ≥768px: one row — no horizontal scroll at 320px (links ≈200px at 12px mono + copyright) |
 | overflow | case meta line | ✅ covered | `role · year · stack · client-type` wraps naturally (mono 14px), no truncation, no horizontal scroll |
+| overflow | contact value rows | ✅ covered | Mono 14px value links wrap naturally (no `white-space: nowrap`), no horizontal scroll at 320px |
+| overflow | hero formula | ✅ covered | Verbatim fixed copy (D-13) wraps naturally in the column — no truncation |
 | keyboard | copy button | ✅ covered | Native `<button type="button">`, global 2px accent focus ring, `aria-live="polite"` status announce; full keyboard path (copy + mailto link) |
 | loading | all | ⛔ dismissed | Static SSG — zero loading surfaces; the copy script executes on click only, no fetching |
 | partial | work/featured | ⛔ dismissed | Data validated at build (5–6 / 2–3); partial renders impossible by contract |
@@ -250,4 +259,4 @@ Safety Gate: `not applicable — component library absent; ADR mandates plain CS
 - [ ] Dimension 5 Spacing: PASS
 - [ ] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved — 2026-08-03
