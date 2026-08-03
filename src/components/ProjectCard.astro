@@ -11,9 +11,11 @@ interface Props {
   theme?: 'terracotta' | 'clay' | 'olive' | 'slate' | 'plum';
   showMetrics?: boolean;
   layout?: 'stacked' | 'split';
+  summary?: string;
+  href?: string;
 }
 
-const { title, meta, theme, showMetrics = false, layout = 'stacked' } = Astro.props;
+const { title, meta, theme, showMetrics = false, layout = 'stacked', summary, href } = Astro.props;
 const isSplit = layout === 'split';
 
 const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string> = {
@@ -33,7 +35,10 @@ const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string
     <slot name="media" />
   </div>
   <div class="card__body">
-    <h3 class="card__title">{title}</h3>
+    <h3 class="card__title">
+      {href ? <a class="card__title-link" href={href}>{title}</a> : title}
+    </h3>
+    {summary && <p class="card__summary">{summary}</p>}
     {showMetrics && meta && <p class="card__meta">{meta}</p>}
     <div class="card__footer">
       <slot />
@@ -71,6 +76,26 @@ const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string
   /* accent — только в hover: нейтральный покой (SC3, D-08) */
   .card:hover .card__title {
     color: var(--project-accent, var(--color-ink));
+  }
+  /* Ссылка-заголовок (AC R4): контракт Link — ink в покое, accent + underline
+     в hover/focus (text-underline-offset 2px — вне шкалы, разрешено) */
+  .card__title-link {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .card__title-link:hover,
+  .card__title-link:focus-visible {
+    color: var(--project-accent, var(--color-accent));
+    text-decoration: underline;
+    text-underline-offset: 2px; /* 2px — вне шкалы, разрешено */
+  }
+  /* Summary (AC R2): body-роль — sans, --text-body, line-height 1.5, muted */
+  .card__summary {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+    margin: 0;
   }
   .card__meta {
     font-family: var(--font-mono);

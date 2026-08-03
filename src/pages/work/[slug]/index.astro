@@ -1,0 +1,98 @@
+---
+// work/[slug]/index.astro — страница кейса (R3, RESEARCH Pattern 2): единственный
+// динамический маршрут фазы — getStaticPaths по коллекции projects (sort по order,
+// Pitfall 10), render(entry) рендерит MDX-тело ровно один раз, h2 → SectionHeading
+// с моно-метой через components-prop (CaseSectionHeading, PROBLEM/RESPONSIBILITY/
+// SOLUTION/RESULT). В components-мапе — ссылка на компонент, не инлайн-функция:
+// функции без метаданных рендера Astro не может классифицировать (NoMatchingRenderer).
+// pageLabel строго «02 / WORK» — не «…/SLUG» (Pitfall 8: метка Footer = последний
+// сегмент pageLabel). Cover — image()-объект из frontmatter, НЕ URL-путь (Pitfall 5).
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+import CaseSectionHeading from '../../../components/CaseSectionHeading.astro';
+import Media from '../../../components/Media.astro';
+import Link from '../../../components/Link.astro';
+import Button from '../../../components/Button.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((entry) => ({ params: { slug: entry.data.slug }, props: { entry, projects } }));
+}
+
+const { entry, projects } = Astro.props;
+const { Content } = await render(entry);
+const idx = projects.findIndex((p) => p.data.slug === entry.data.slug);
+const next = projects[(idx + 1) % projects.length];
+const { title, summary, role, stack, year, 'client-type': clientType, cover, coverAlt } = entry.data;
+---
+<BaseLayout
+  title={`${title} — кейс · Иван Шиваршинов`}
+  description={summary}
+  pageLabel="02 / WORK"
+>
+  <article class="case">
+    <p class="case__meta">{`${role} · ${year} · ${stack.join(', ')} · ${clientType}`}</p>
+    <Media ratio="16:9" caption={coverAlt}>
+      <Image class="case-img" src={cover} alt={coverAlt} />
+    </Media>
+    <div class="case__body">
+      <Content components={{ h2: CaseSectionHeading }} />
+    </div>
+    <nav class="case__nav">
+      <Link href="/work">← Все работы</Link>
+      <Button variant="secondary" density="md" href={`/work/${next.data.slug}/`}>Следующий кейс</Button>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .case {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+  /* Шапка: моно-meta role · year · stack · client-type — переносится
+     естественно, без nowrap (UI-SPEC overflow case meta line) */
+  .case__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+  /* Скриншот заполняет Media-фрейм 16:9 (overflow hidden в Media) */
+  .case-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Prose-контракт (UI-SPEC): абзацы Manrope 16/1.5, мера ~65ch; секции
+     (SectionHeading из h2-подмены) — ритм --space-2xl; сильные лейблы — 600 */
+  .case__body :global(p) {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-md);
+    max-width: 65ch;
+  }
+  .case__body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  .case__body :global(strong) {
+    font-weight: 600;
+  }
+  .case__body :global(.section-heading) {
+    margin-top: var(--space-2xl);
+  }
+  /* Нижняя навигация: «Все работы» + «Следующий кейс» (замыкание по order) */
+  .case__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+</style>

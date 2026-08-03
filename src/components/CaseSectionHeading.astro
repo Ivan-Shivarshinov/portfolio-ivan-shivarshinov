@@ -1,0 +1,21 @@
+---
+// CaseSectionHeading.astro — обёртка h2 → SectionHeading для components-prop
+// Content.render() (03-03, RESEARCH Pattern 2). MDX-компоненты в components-мапе
+// обязаны быть ссылками на реальные компоненты (у инлайн-функций нет метаданных
+// рендера — Astro бросает NoMatchingRenderer: Unable to render `h2`). Текст
+// заголовка приходит слотом default, НЕ в Astro.props.children: renderJSXVNode
+// (astro/dist/runtime/server/jsx.js) выносит children в слоты. SECTION_META —
+// моно-мета PROBLEM/RESPONSIBILITY/SOLUTION/RESULT по тексту h2.
+import SectionHeading from './SectionHeading.astro';
+
+const SECTION_META: Record<string, string> = {
+  'Проблема': 'PROBLEM',
+  'Ответственность': 'RESPONSIBILITY',
+  'Решение': 'SOLUTION',
+  'Результат': 'RESULT',
+};
+
+const headingText = ((await Astro.slots.render('default')) ?? '').trim();
+---
+
+<SectionHeading meta={SECTION_META[headingText] ?? 'SECTION'} title={headingText} />

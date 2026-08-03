@@ -1,64 +1,66 @@
 ---
-// work.astro — маршрут /work; SYSTEM DEMO-блок фазы 2 (UI-SPEC Page structure):
-// SectionHeading «SYSTEM DEMO / системная демонстрация» + фикстурные ProjectCard
-// с Media и Tag — последний узел grep-контроля использования компонентов
-// (check-tokens R3), после него полный verify зелёный. Фикстурные пропы — только
-// фаза 2 (AC#7): реальные кейсы из content collections приходят в фазе 3,
-// content.config.ts не изменяется.
+// work.astro — маршрут /work (R2): карточки кейсов из коллекции projects —
+// SectionHeading «CASE STUDIES / Работы» + grid карточек (2 колонки ≥768px).
+// Сортировка по order (D-09, Pitfall 10); скриншот — image()-объект cover,
+// НЕ URL-путь (Pitfall 5). Фикстурный SYSTEM DEMO-блок удалён (AC R2).
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Media from '../components/Media.astro';
 import Tag from '../components/Tag.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 ---
 <BaseLayout
   title="Работы — Иван Шиваршинов"
   description="Кейсы веб-разработки: от простых сайтов до контентных систем и веб-инструментов."
   pageLabel="02 / WORK"
 >
-  <section class="system-demo">
-    <SectionHeading meta="SYSTEM DEMO" title="Системная демонстрация" layout="split" />
-    <!-- Фикстурные карточки — рабочая версия фазы 2 (AC#7); // fixture: replaced in phase 3 -->
-    <div class="system-demo__list">
-      <ProjectCard
-        title='Проект «Терракота»'
-        meta='дизайн · 2026'
-        theme='terracotta'
-        showMetrics={true}
-        layout='stacked'
-      >
-        <Media slot="media" ratio="4:3" caption="Превью проекта — фаза 3" />
-        <Tag label="Web" theme="terracotta" />
-        <Tag label="CMS" />
-      </ProjectCard>
-      <ProjectCard
-        title='Проект «Олива»'
-        meta='разработка · 2026'
-        theme='olive'
-        showMetrics={false}
-        layout='split'
-      >
-        <Media slot="media" ratio="3:2" />
-        <Tag label="Astro" />
-      </ProjectCard>
+  <section class="work">
+    <SectionHeading meta="CASE STUDIES" title="Работы" layout="split" />
+    <div class="work__list">
+      {projects.map((p) => (
+        <ProjectCard
+          title={p.data.title}
+          meta={`${p.data.role} · ${p.data.year}`}
+          theme={p.data.theme}
+          summary={p.data.summary}
+          href={`/work/${p.data.slug}/`}
+        >
+          <Media slot="media" ratio="4:3">
+            <Image class="card-img" src={p.data.cover} alt={p.data.coverAlt} />
+          </Media>
+          {p.data.stack.slice(0, 3).map((s) => (
+            <Tag label={s} theme={p.data.theme} />
+          ))}
+        </ProjectCard>
+      ))}
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .system-demo {
+  .work {
     display: flex;
     flex-direction: column;
     gap: var(--space-2xl);
   }
-  .system-demo__list {
+  .work__list {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-lg);
   }
+  /* Скриншот заполняет Media-фрейм 4:3 (overflow hidden в Media) */
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   /* Число 768 = --bp-md (сверяет check-tokens): на ≥768px — 2 колонки карточек */
   @media (min-width: 768px) {
-    .system-demo__list {
+    .work__list {
       grid-template-columns: repeat(2, 1fr);
     }
   }
