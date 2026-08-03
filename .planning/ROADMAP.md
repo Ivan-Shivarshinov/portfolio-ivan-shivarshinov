@@ -111,7 +111,7 @@ Plans:
   4. Capabilities поданы иерархией Build / Improve / Extend без длинного списка инструментов; Lab Preview показывает мост к продуктам, AI и автоматизациям.
   5. Тексты всего сайта соответствуют тону: спокойный, конкретный, технически грамотный, без хайпа и лишних англицизмов.
 
-**Plans**: 2/6 plans executed
+**Plans**: 3/6 plans executed
 
 Plans:
 **Wave 1**
@@ -121,7 +121,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-03-PLAN.md — Tracer: состав кейсов (решение) + первый кейс end-to-end (MDX, ProjectCard summary/href, /work из коллекции, /work/{slug}/) + утверждение K1–K4
+- [x] 03-03-PLAN.md — Tracer: состав кейсов (решение) + первый кейс end-to-end (MDX, ProjectCard summary/href, /work из коллекции, /work/{slug}/) + утверждение K1–K4
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -190,7 +190,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
 | 2. Визуальная система | 6/6 | Complete    | 2026-08-03 |
-| 3. Контент и страницы | 2/6 | In Progress|  |
+| 3. Контент и страницы | 3/6 | In Progress|  |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |
 | 6. Качество и запуск | TBD | Not started | - |

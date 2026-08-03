@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: kontent-i-stranicy
 status: executing
-stopped_at: "Completed 03-02-PLAN.md (валидационный каркас: check-tone, правила 7/9 check-tokens, параметризация check-seo)"
-last_updated: "2026-08-03T16:28:56.762Z"
+stopped_at: Completed 03-03-PLAN.md (первый кейс skala end-to-end, утверждён K1–K4)
+last_updated: "2026-08-03T18:55:10.856Z"
 last_activity: 2026-08-03
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 19
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Состояние проекта
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 ## Current Position
 
 Phase: 03 (kontent-i-stranicy) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-08-03 — Phase 03 execution started
 
-Progress: [████████░░] 79%
+Progress: [████████░░] 84%
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Progress: [████████░░] 79%
 | Phase 02-vizualnaya-sistema P06 | 8h 48m | 2 tasks | 5 files |
 | Phase 03 P01 | 5 | 2 tasks | 2 files |
 | Phase 03-kontent-i-stranicy P02 | 9 | 3 tasks | 4 files |
+| Phase 03 P03 | 25 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,10 @@ Progress: [████████░░] 79%
 - [Phase ?]: Правило 9 check-tokens: ровно 1 тег <script> суммарно по dist, только на contact/index.html (D-10 — копирование email, первый клиентский JS); сайт без скрипта — нарушение, текущий dist (0) — ожидаемый red до 03-05. Потребитель: 03-05 (contact.astro copy-скрипт).
 - [Phase ?]: Правило 7 check-tokens: страницы кейсов work/{slug}/index.html (regex ^work/[^/]+/index.html$) — ровно 0 aria-current (Pitfall 1); верхнеуровневые — ровно 1 с верным href. Потребитель: 03-03/03-04 (страницы кейсов).
 - [Phase ?]: check-seo параметризован фактом из коллекции: EXPECTED_PAGES = 5 + N записей src/content/projects (computeExpectedPages, Open Question 1); граница 5–6 остаётся контрактом check-collections, check-seo не дублирует её. Потребитель: 03-03 (наполнение кейсов — число страниц 10–11).
+- [Phase ?]: Состав кейсов фазы 3 утверждён 2026-08-03: 6 реальных проектов (skala, buzko-legal, dias, winwin, mayak, tech-law-conf); темы D-07 slate/plum/clay/olive/clay/slate; реальные имена клиентов (NDA не требуется, D-03/K2)
+- [Phase ?]: Featured ровно 3: skala, buzko-legal, winwin (D-09); tracer-кейс — skala (D-01)
+- [Phase ?]: Правка пользователя в кейс skala (03-03 Task 3): в «Результат» добавлена метрика роста команд ~100 → 600+ (публичная цифра skala.io «600+ команд», узкая — платформа, не сайт)
+- [Phase ?]: Галерея кейсов (2–4 скриншота на кейс) отложена: gap-план после верификации фазы (03-03 checkpoint, deferred-items.md) — затрагивает content.config.ts, страницу кейса, check-collections
 
 ### Pending Todos
 
@@ -150,6 +155,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T16:28:56.728Z
-Stopped at: Completed 03-02-PLAN.md (валидационный каркас: check-tone, правила 7/9 check-tokens, параметризация check-seo)
+Last session: 2026-08-03T18:55:10.835Z
+Stopped at: Completed 03-03-PLAN.md (первый кейс skala end-to-end, утверждён K1–K4)
 Resume file: None
