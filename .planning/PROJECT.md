@@ -29,7 +29,7 @@
 - [ ] **REQ-competency-architecture**: компетенции Build / Improve / Extend — Phase 3
 - [ ] **REQ-evidence-cases**: кейсы по схеме «проблема → ответственность → решение → результат» — Phase 3
 - [ ] **REQ-tone**: тон коммуникации — Phase 3
-- [ ] **REQ-design-implications**: следствия для дизайна — Phase 2
+- [x] **REQ-design-implications**: следствия для дизайна — Phase 2 (Validated in Phase 2: Визуальная система)
 - [ ] **REQ-growth-trajectory**: мост к веб-инструментам и продуктам (Lab) — Phase 3
 
 Полный текст: `.planning/REQUIREMENTS.md`
@@ -110,4 +110,4 @@
 - Требования Validated только после реализации и проверки (verify-phase)
 
 ---
-*Last updated: 2026-08-02 — Phase 1 «Основа проекта» complete: Astro-каркас, tokens, контентные схемы, SEO-база, spike Stacki, CI (фазовые решения и шрифты — в STATE.md Decisions)*
+*Last updated: 2026-08-03 — Phase 2 «Визуальная система» complete: токены (6 групп), компонентная библиотека (19 компонентов), hero-shell, SYSTEM DEMO, визуальный проход (1 дефект интерполяции найден и закрыт регрессионным правилом). REQ-design-implications validated.*
