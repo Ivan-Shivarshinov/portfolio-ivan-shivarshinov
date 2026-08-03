@@ -1,31 +1,48 @@
 #!/usr/bin/env node
 // scripts/check-seo.mjs — проверка R4 (01-VALIDATION.md, Per-Task Verification Map R4):
-// 5 уникальных пар title/description, canonical + Open Graph на каждой странице,
-// sitemap-index.xml содержит все 5 маршрутов.
+// уникальные пары title/description, canonical + Open Graph на каждой странице,
+// sitemap-index.xml содержит все маршруты.
 //
 // CLI:
 //   node scripts/check-seo.mjs            — аудит собранного dist/ (перед прогоном: npm run build)
 //   node scripts/check-seo.mjs --self-test — встроенные HTML/XML-фикстуры без сети
 //
-// Правила (контракт 01-02-PLAN.md Task 2):
-// 1. Ровно 5 уникальных пар (title, description) по всем собранным страницам dist/**/*.html;
-//    дубль пары или количество страниц != 5 → exit 1 с перечислением дублей.
+// Правила (контракт 01-02-PLAN.md Task 2 + параметризация фазы 3, Open Question 1):
+// 1. Ровно N уникальных пар (title, description) по всем собранным страницам dist/**/*.html,
+//    где N = 5 фиксированных страниц + число записей коллекции projects (computeExpectedPages);
+//    дубль пары или количество страниц != N → exit 1 с перечислением дублей.
 // 2. Каждая страница содержит: link rel="canonical", meta property="og:title",
 //    og:description, og:type, og:url, og:locale — отсутствие любого → exit 1.
-// 3. dist/sitemap-index.xml содержит 5 элементов url (НЕ sitemap.xml — фактический вывод
+// 3. dist/sitemap-index.xml содержит N элементов url (НЕ sitemap.xml — фактический вывод
 //    @astrojs/sitemap 3.x, Pitfall 3) — иначе exit 1.
 //
 // Exit 0 — все проверки зелёные.
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST_DIR = join(ROOT, 'dist');
 const SITEMAP_INDEX = 'sitemap-index.xml'; // Pitfall 3: НЕ sitemap.xml
-const EXPECTED_PAGES = 5;
-const EXPECTED_SITEMAP_URLS = 5;
+const PROJECTS_DIR = 'src/content/projects';
+const FIXED_PAGES = 5; // фиксированные страницы: /, /work/, /lab/, /about/, /contact/
+
+/**
+ * Ожидаемое число страниц сайта: 5 фиксированных + число записей коллекции projects
+ * (Open Question 1 — параметризация фактом из коллекции). Границу «5–6 записей»
+ * НЕ дублирует — это контракт check-collections; здесь честное фактическое ожидание.
+ * .gitkeep и прочие dot-файлы не считаются (walk пропускает скрытые файлы).
+ * @param {string} rootDir корень проекта
+ * @returns {number} 5 + N
+ */
+function computeExpectedPages(rootDir) {
+  return FIXED_PAGES + walk(join(rootDir, PROJECTS_DIR), ['.md', '.mdx']).length;
+}
+
+const EXPECTED_PAGES = computeExpectedPages(ROOT);
+const EXPECTED_SITEMAP_URLS = EXPECTED_PAGES;
 
 const REQUIRED_OG_TAGS = ['og:title', 'og:description', 'og:type', 'og:url', 'og:locale'];
 
@@ -91,8 +108,10 @@ function extractMeta(html) {
 
 /**
  * Аудит набора страниц [{ file, html }]. Возвращает список проблем (пусто = чисто).
+ * @param {Array<{file: string, html: string}>} pages страницы
+ * @param {number} expected ожидаемое число страниц (5 + число кейсов)
  */
-function auditPages(pages) {
+function auditPages(pages, expected) {
   const issues = [];
   const audited = pages.map(({ file, html }) => {
     const meta = extractMeta(html);
@@ -106,8 +125,8 @@ function auditPages(pages) {
     return { file, meta, pageIssues };
   });
 
-  if (pages.length !== EXPECTED_PAGES) {
-    issues.push(`найдено страниц: ${pages.length}, ожидалось ${EXPECTED_PAGES}`);
+  if (pages.length !== expected) {
+    issues.push(`найдено страниц: ${pages.length}, ожидалось ${expected}`);
   }
 
   const pairCounts = new Map();
@@ -123,8 +142,8 @@ function auditPages(pages) {
       );
     }
   }
-  if (audited.every((p) => p.pageIssues.length === 0) && pairCounts.size !== EXPECTED_PAGES) {
-    issues.push(`уникальных пар title/description: ${pairCounts.size}, ожидалось ${EXPECTED_PAGES}`);
+  if (audited.every((p) => p.pageIssues.length === 0) && pairCounts.size !== expected) {
+    issues.push(`уникальных пар title/description: ${pairCounts.size}, ожидалось ${expected}`);
   }
 
   for (const p of audited) {
@@ -140,8 +159,9 @@ function auditPages(pages) {
  * маршруты лежат в sitemap-0.xml, на который индекс ссылается.
  * @param {string} indexXml текст sitemap-index.xml
  * @param {(fileName: string) => string|null} readChild читает дочерний sitemap по имени файла; null — файл отсутствует
+ * @param {number} expected ожидаемое суммарное число url (5 + число кейсов)
  */
-function auditSitemap(indexXml, readChild) {
+function auditSitemap(indexXml, readChild, expected) {
   const childLocs = [...indexXml.matchAll(/<\s*sitemap\s*>\s*<loc>([^<]+)<\/loc>\s*<\/sitemap>/g)].map((m) => m[1]);
   if (childLocs.length === 0) {
     return [`${SITEMAP_INDEX} не ссылается ни на один дочерний sitemap`];
@@ -161,8 +181,8 @@ function auditSitemap(indexXml, readChild) {
   if (missing.length > 0) {
     issues.push(`дочерние sitemap-файлы не найдены в dist/: ${missing.join(', ')}`);
   }
-  if (total !== EXPECTED_SITEMAP_URLS) {
-    issues.push(`дочерние sitemap-файлы содержат ${total} url, ожидалось ${EXPECTED_SITEMAP_URLS}`);
+  if (total !== expected) {
+    issues.push(`дочерние sitemap-файлы содержат ${total} url, ожидалось ${expected}`);
   }
   return issues;
 }
@@ -179,7 +199,7 @@ function auditDist() {
     return ['в dist/ нет собранных .html страниц'];
   }
   const pages = htmlFiles.map((f) => ({ file: f, html: readText(f) }));
-  const issues = auditPages(pages);
+  const issues = auditPages(pages, EXPECTED_PAGES);
 
   const sitemapAbs = join(DIST_DIR, SITEMAP_INDEX);
   if (!existsSync(sitemapAbs)) {
@@ -191,14 +211,16 @@ function auditDist() {
       const p = join(DIST_DIR, fileName);
       return existsSync(p) ? readText(p) : null;
     };
-    issues.push(...auditSitemap(readText(sitemapAbs), readChild));
+    issues.push(...auditSitemap(readText(sitemapAbs), readChild, EXPECTED_SITEMAP_URLS));
   }
   return issues;
 }
 
 function render(issues) {
   if (issues.length === 0) {
-    console.log('check-seo: OK — 5 уникальных пар title/description, canonical + OG везде, sitemap-index.xml → sitemap-0.xml с 5 url');
+    console.log(
+      `check-seo: OK — ${EXPECTED_PAGES} уникальных пар title/description, canonical + OG везде, sitemap-index.xml → sitemap-0.xml с ${EXPECTED_SITEMAP_URLS} url`
+    );
     return 0;
   }
   console.error(`check-seo: FAIL — ${issues.length} проблем:`);
@@ -238,8 +260,13 @@ const GOOD_SITEMAP_CHILD = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://portfolio.example.com/lab/</loc></url>
   <url><loc>https://portfolio.example.com/about/</loc></url>
   <url><loc>https://portfolio.example.com/contact/</loc></url>
+  <url><loc>https://portfolio.example.com/work/zz-case-a/</loc></url>
+  <url><loc>https://portfolio.example.com/work/zz-case-b/</loc></url>
 </urlset>`;
 const makeSitemapFixtures = (childText) => (fileName) => (fileName === 'sitemap-0.xml' ? childText : null);
+
+// Ожидание self-test: 5 фиксированных страниц + 2 фикстурных кейса = 7 (см. runSelfTest).
+const SELFTEST_EXPECTED = 7;
 
 function runSelfTest() {
   let failures = 0;
@@ -251,20 +278,44 @@ function runSelfTest() {
   };
   const hasIssue = (list, needle) => list.some((i) => i.includes(needle));
 
-  // good: 5 уникальных пар + все OG-теги → без проблем
-  const goodPages = ['Главная', 'Работы', 'Лаборатория', 'Обо мне', 'Контакты'].map((t, idx) => ({
+  // параметризация: ожидаемое число страниц = 5 + число записей коллекции projects
+  const tmp = mkdtempSync(join(tmpdir(), 'check-seo-'));
+  try {
+    const projDir = join(tmp, 'src/content/projects');
+    mkdirSync(projDir, { recursive: true });
+    // frontmatter-заглушки: важен только подсчёт файлов (.md/.mdx); dot-файлы не считаются
+    writeFileSync(join(projDir, 'zz-case-a.mdx'), "---\nslug: 'zz-case-a'\n---\n");
+    writeFileSync(join(projDir, 'zz-case-b.mdx'), "---\nslug: 'zz-case-b'\n---\n");
+    writeFileSync(join(projDir, '.gitkeep'), '');
+    assert(
+      computeExpectedPages(tmp) === SELFTEST_EXPECTED,
+      `computeExpectedPages: 5 + 2 записи = 7 (получено: ${computeExpectedPages(tmp)})`
+    );
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+
+  // good: 7 уникальных пар (5 фиксированных + 2 кейса) + все OG-теги → без проблем
+  const goodPages = [
+    'Главная', 'Работы', 'Лаборатория', 'Обо мне', 'Контакты', 'Кейс A', 'Кейс B',
+  ].map((t, idx) => ({
     file: `p${idx + 1}.html`,
-    html: makePage(t, `Описание: ${t}`, { path: ['/', '/work/', '/lab/', '/about/', '/contact/'][idx] }),
+    html: makePage(t, `Описание: ${t}`, {
+      path: ['/', '/work/', '/lab/', '/about/', '/contact/', '/work/zz-case-a/', '/work/zz-case-b/'][idx],
+    }),
   }));
-  const good = auditPages(goodPages);
-  assert(good.length === 0, `good: 5 уникальных пар + OG → без проблем (получено: ${JSON.stringify(good)})`);
+  const good = auditPages(goodPages, SELFTEST_EXPECTED);
+  assert(
+    good.length === 0,
+    `good: ${SELFTEST_EXPECTED} уникальных пар + OG → без проблем (получено: ${JSON.stringify(good)})`
+  );
 
   // дубль пары → детект
   const dupPages = [
-    ...goodPages.slice(0, 4),
-    { file: 'p5.html', html: makePage('Главная', 'Описание: Главная', { path: '/work/' }) },
+    ...goodPages.slice(0, 6),
+    { file: 'p7.html', html: makePage('Кейс A', 'Описание: Кейс A', { path: '/work/zz-case-b/' }) },
   ];
-  const dup = auditPages(dupPages);
+  const dup = auditPages(dupPages, SELFTEST_EXPECTED);
   assert(
     hasIssue(dup, 'дубль пары title/description'),
     'дубль: повтор пары title/description детектируется'
@@ -272,28 +323,38 @@ function runSelfTest() {
 
   // отсутствие og:url → детект
   const noOgUrl = [
-    ...goodPages.slice(0, 4),
-    { file: 'p5.html', html: makePage('Контакты', 'Описание: Контакты', { path: '/contact/', skipOgUrl: true }) },
+    ...goodPages.slice(0, 6),
+    { file: 'p7.html', html: makePage('Кейс B', 'Описание: Кейс B', { path: '/work/zz-case-b/', skipOgUrl: true }) },
   ];
-  const missingOg = auditPages(noOgUrl);
+  const missingOg = auditPages(noOgUrl, SELFTEST_EXPECTED);
   assert(
     hasIssue(missingOg, 'og:url'),
     'missing-og: отсутствие meta property="og:url" детектируется'
   );
 
-  // sitemap-фикстура (индекс → дочерний urlset): 5 url → pass; 4 url → fail; пустой индекс → fail
-  const sitemapOk = auditSitemap(GOOD_SITEMAP_INDEX, makeSitemapFixtures(GOOD_SITEMAP_CHILD));
-  assert(sitemapOk.length === 0, `sitemap: 5 url → pass (получено: ${JSON.stringify(sitemapOk)})`);
-  const sitemapBad = auditSitemap(GOOD_SITEMAP_INDEX, makeSitemapFixtures(GOOD_SITEMAP_CHILD.replace('<url>', '')));
-  assert(hasIssue(sitemapBad, 'содержат 4 url'), 'sitemap: 4 url → fail детектируется');
-  const sitemapEmpty = auditSitemap('<sitemapindex></sitemapindex>', makeSitemapFixtures(GOOD_SITEMAP_CHILD));
+  // sitemap-фикстура (индекс → дочерний urlset): 7 url → pass; 6 url → fail; пустой индекс → fail
+  const sitemapOk = auditSitemap(GOOD_SITEMAP_INDEX, makeSitemapFixtures(GOOD_SITEMAP_CHILD), SELFTEST_EXPECTED);
+  assert(
+    sitemapOk.length === 0,
+    `sitemap: ${SELFTEST_EXPECTED} url → pass (получено: ${JSON.stringify(sitemapOk)})`
+  );
+  const sitemapBad = auditSitemap(
+    GOOD_SITEMAP_INDEX,
+    makeSitemapFixtures(GOOD_SITEMAP_CHILD.replace('<url>', '')),
+    SELFTEST_EXPECTED
+  );
+  assert(hasIssue(sitemapBad, 'содержат 6 url'), 'sitemap: 6 url (ожидалось 7) → fail детектируется');
+  const sitemapEmpty = auditSitemap('<sitemapindex></sitemapindex>', makeSitemapFixtures(GOOD_SITEMAP_CHILD), SELFTEST_EXPECTED);
   assert(hasIssue(sitemapEmpty, 'не ссылается ни на один дочерний sitemap'), 'sitemap: пустой индекс → fail детектируется');
 
   // отсутствие canonical → детект
   const noCanonical = [
     { file: 'p1.html', html: makePage('Главная', 'Описание', { path: '/' }).replace(/<link rel="canonical"[^>]*\/>/, '') },
   ];
-  assert(hasIssue(auditPages(noCanonical), 'canonical'), 'no-canonical: отсутствие rel="canonical" детектируется');
+  assert(
+    hasIssue(auditPages(noCanonical, SELFTEST_EXPECTED), 'canonical'),
+    'no-canonical: отсутствие rel="canonical" детектируется'
+  );
 
   if (failures > 0) {
     console.error(`self-test: ${failures} сбоев логики`);
