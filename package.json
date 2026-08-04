@@ -16,7 +16,7 @@
     "check-tone": "node scripts/check-tone.mjs",
     "check-collections": "node scripts/check-collections.mjs",
     "check-spike-doc": "node scripts/check-spike-doc.mjs",
-    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-contrast && npm run check-collections && node scripts/check-prohibitions.mjs && npm run check-visual",
+    "verify": "npm run build && npm run check-seo && npm run check-tokens && npm run check-contrast && npm run check-collections && node scripts/check-prohibitions.mjs && npm run check-tone && npm run check-visual",
     "check-visual": "node scripts/check-visual.mjs"
   },
   "engines": {
