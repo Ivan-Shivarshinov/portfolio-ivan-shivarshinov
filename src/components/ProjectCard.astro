@@ -53,6 +53,9 @@ const ACCENTS: Record<'terracotta' | 'clay' | 'olive' | 'slate' | 'plum', string
     gap: var(--space-md);
     padding: var(--space-lg);
     border: 1px solid var(--color-line); /* 1px — вне шкалы, разрешено */
+    /* min-width: 0 — карточка не раздувает grid-трек до min-content
+       (intrinsic-ширина скриншота 1920px, Pitfall 3/6: grid blowout на 768px) */
+    min-width: 0;
     transition: border-color var(--motion-base) var(--ease-standard);
   }
   .card:hover {

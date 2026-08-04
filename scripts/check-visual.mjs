@@ -383,7 +383,7 @@ async function main() {
   }
 
   if (failures > 0) {
-    console.error(`\nFAIL: ${failures} визуальн(ый/ых) проверк(а/и) не прошли — см. лог. Сервер: ${stderrRef()}`);
+    console.error(`\nFAIL: ${failures} визуальн(ый/ых) проверк(а/и) не прошли — см. лог. (preview stderr при недоступности сервера выводится в ensurePreview)`);
     process.exit(1);
   }
   console.log('\nOK: визуальный смоук пройден — скролла нет, hover-отклики, reduced-motion и копирование в норме');
