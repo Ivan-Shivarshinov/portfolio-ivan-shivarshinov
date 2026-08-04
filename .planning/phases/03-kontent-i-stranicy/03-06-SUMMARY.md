@@ -70,8 +70,8 @@ status: complete
 Each task was committed atomically:
 
 1. **Task 1: Черновики кейсов 2–6 + папки активов** - `3ea2361` (feat) — 5 MDX + 5 папок со скриншотами (коммит после утверждения Task 2)
-2. **Task 3: финальный гейт** - `2b2186c` (fix) — ProjectCard min-width: 0 + failure-path check-visual; `a93c1c8` (feat) — verify-цепочка с check-tone + журнал 03-VERIFICATION.md (см. ниже)
-3. **Summary + state** - `…` (docs) — 03-06-SUMMARY.md, STATE.md, ROADMAP.md
+2. **Task 3: финальный гейт** - `2b2186c` (fix) — ProjectCard min-width: 0 + failure-path check-visual; `6fb2070` (feat) — verify-цепочка с check-tone + журнал 03-VERIFICATION.md
+3. **Summary + state** - `af729f0` (docs) — 03-06-SUMMARY.md, STATE.md, ROADMAP.md, 03-PATTERNS.md, deferred-items.md
 
 **Plan metadata:** `f27002c` (docs: create phase plan) — план; финальный docs-коммит SUMMARY см. ниже
 
