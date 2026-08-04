@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Основа проекта** - Astro-каркас, tokens, схемы данных, layouts, SEO и spike-проверка Stacki (completed 2026-08-02)
 - [x] **Phase 2: Визуальная система** - типографика, цвет, сетка, переиспользуемые компоненты, motion-токены (completed 2026-08-03)
-- [ ] **Phase 3: Контент и страницы** - Home, Work, Case Study, Lab, About, Contact с реальным контентом
+- [x] **Phase 3: Контент и страницы** - Home, Work, Case Study, Lab, About, Contact с реальным контентом (completed 2026-08-04)
 - [ ] **Phase 4: Прототип индекса работ** - изолированный Three.js-прототип центральной механики и вердикт
 - [ ] **Phase 5: Интеграция индекса и motion** - сцена в Astro island, реальные данные Work, переход «список → кейс»
 - [ ] **Phase 6: Качество и запуск** - quality gates, адаптив, SEO, производительность, деплой и кейс интерактивного слоя
@@ -111,7 +111,7 @@ Plans:
   4. Capabilities поданы иерархией Build / Improve / Extend без длинного списка инструментов; Lab Preview показывает мост к продуктам, AI и автоматизациям.
   5. Тексты всего сайта соответствуют тону: спокойный, конкретный, технически грамотный, без хайпа и лишних англицизмов.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans executed
 
 Plans:
 **Wave 1**
@@ -130,7 +130,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 03-06-PLAN.md — Кейсы 2–6 + финальный гейт: verify-цепочка с check-tone, полный прогон, 03-VERIFICATION.md (K1–K4, ручной проход тона)
+- [x] 03-06-PLAN.md — Кейсы 2–6 + финальный гейт: verify-цепочка с check-tone, полный прогон, 03-VERIFICATION.md (K1–K4, ручной проход тона)
 
 **UI hint**: yes
 
@@ -190,7 +190,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Основа проекта | 7/7 | Complete    | 2026-08-02 |
 | 2. Визуальная система | 6/6 | Complete    | 2026-08-03 |
-| 3. Контент и страницы | 5/6 | In Progress|  |
+| 3. Контент и страницы | 6/6 | Complete    | 2026-08-04 |
 | 4. Прототип индекса работ | TBD | Not started | - |
 | 5. Интеграция индекса и motion | TBD | Not started | - |
 | 6. Качество и запуск | TBD | Not started | - |

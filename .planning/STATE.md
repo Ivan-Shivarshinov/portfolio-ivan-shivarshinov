@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: kontent-i-stranicy
-status: executing
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-08-03T21:41:50.332Z"
+status: verifying
+stopped_at: Completed 03-06-PLAN.md — phase 03 complete
+last_updated: "2026-08-04T09:06:25.307Z"
 last_activity: 2026-08-03
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # Состояние проекта
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-07-31)
 
 Phase: 03 (kontent-i-stranicy) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-03 — Phase 03 execution started
 
-Progress: [██████████] 95%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: [██████████] 95%
 | Phase 03 P03 | 25 | 3 tasks | 7 files |
 | Phase 03-kontent-i-stranicy P04 | 15 | 2 tasks | 3 files |
 | Phase 03-kontent-i-stranicy P05 | 6min | 3 tasks | 4 files |
+| Phase 03-kontent-i-stranicy P06 | 50min | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,10 @@ Progress: [██████████] 95%
 - [Phase ?]: Тексты /about и /lab утверждены пользователем 2026-08-03 (D-04, чекпоинт Task 2, ответ «Тексты утверждены») — коммит без правок формулировок
 - [Phase ?]: Формула обещания на / — дословно REQ-main-promise (D-13): Lead → моно → Body → категория → подпись; CTA «Смотреть работы» — последний элемент hero (Q5)
 - [Phase ?]: checkLinkHoverLogic: ok = смена цвета ссылки (underline — контракт Link-компонента, не футер-ссылок); Шаг 5 проверяет state machine копирования, а не успех clipboard
+- [Phase ?]: Кейсы 2–6 утверждены пользователем дословно (D-04, чекпоинт 03-06 Task 2): K1–K4 по каждому — факты реальные, именование корректное, личное/командное/эффект разделены, скриншоты — реальные интерфейсы
+- [Phase ?]: check-tone добавлен в verify-цепочку после check-prohibitions (T-03-16), когда real-run по dist зелёный; денлист 22 записи сохранён без корректировок — ложных срабатываний нет (R9/A4)
+- [Phase ?]: Grid blowout на / @768px: фикс на уровне компонента (ProjectCard min-width: 0), а не сетки — общий фикс для featured-сетки и /work
+- [Phase ?]: Ремарка пользователя «будет ещё куча правок перед продакшном» — ожидаемо для черновиков (D-04), не блокирует гейт фазы
 
 ### Pending Todos
 
@@ -161,6 +166,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-03T21:41:50.310Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-08-04T09:06:09.028Z
+Stopped at: Completed 03-06-PLAN.md — phase 03 complete
 Resume file: None
